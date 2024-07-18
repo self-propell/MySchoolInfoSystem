@@ -1,0 +1,82 @@
+﻿@inherits LayoutComponentBase
+
+<MApp Style="background-color:#fafafa">
+        <PPageTabsProvider>
+            <MAppBar App Color="white">
+                行政人员后台系统
+            </MAppBar>
+
+            <MMain>
+                
+                <PPageTabs @ref="_pageTabs"
+                           BackgroundColor="rgba(0,0,0,0)"
+                           HideSlider
+                           NoDataPath="@s_noDataPath"
+                           TabOptions="@TabOptions">
+                </PPageTabs>
+
+
+                <MDivider></MDivider>
+
+                <PPageContainer PageTabs="_pageTabs" Max="4">
+                    <MContainer Fluid>
+                        @Body
+                    </MContainer>
+                </PPageContainer>
+            <MNavigationDrawer App Class="app-nav-drawer">
+                <MImage MinHeight="70" Src="/pic/logo.png"></MImage>
+                <MList Routable Nav Dense>
+                    <MListItem ActiveClass="primary--text" Href="/UniversityAdmin/Index">
+                        <MListItemIcon Style="width:5%; margin-left:18%">
+                            <MIcon>mdi-home</MIcon>
+                        </MListItemIcon>
+                        <MListItemContent>
+                            <MListItemTitle >首页</MListItemTitle>
+                        </MListItemContent>
+                    </MListItem>
+                    <MListItem ActiveClass="primary--text" Href="/UniversityAdmin/Teacher">
+                        <MListItemIcon Style="width:5%; margin-left:18%">
+                            <MIcon>mdi-card-account-details</MIcon>
+                        </MListItemIcon>
+                        <MListItemContent>
+                            <MListItemTitle>教师信息管理</MListItemTitle>
+                        </MListItemContent>
+                    </MListItem>
+                    <MListItem ActiveClass="primary--text" Href="/UniversityAdmin/Course">
+                        <MListItemIcon Style="width:5%; margin-left:18%">
+                            <MIcon>mdi-card-account-details</MIcon>
+                        </MListItemIcon>
+                        <MListItemContent>
+                            <MListItemTitle>课程信息管理</MListItemTitle>
+                        </MListItemContent>
+                    </MListItem>
+                </MList>
+            </MNavigationDrawer>
+            </MMain>
+        </PPageTabsProvider>
+        
+
+    </MApp>
+
+
+@code {
+
+    private PPageTabs? _pageTabs;
+
+    private static readonly string s_noDataPath = "/UniversityAdmin/Index";
+
+    private TabOptions? TabOptions(PageTabPathValue pathValue)
+    {
+        switch (pathValue.AbsolutePath)
+        {
+            case "/UniversityAdmin/Teacher":
+                return new TabOptions("教师信息管理", "mdi-tab", "font-weight-bold");
+            case "/UniversityAdmin/Index":
+                return new TabOptions("首页", "mdi-tab", "font-weight-bold");
+            case "/UniversityAdmin/Course":
+                return new TabOptions("课程信息管理", "mdi-tab", "font-weight-bold");
+            default: return null;
+        }
+    }
+
+}
