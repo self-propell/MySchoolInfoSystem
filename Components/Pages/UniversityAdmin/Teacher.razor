@@ -52,7 +52,7 @@
                       Sm="2"
                       Md="1"
                       Style="padding:18px 12px 5px 5px;">
-                    <MCheckbox @bind-value="searchModel.Deleted" TValue="bool" OnChange="onSearch" Style="margin-top:0%; padding:0%;"><LabelContent>已删除</LabelContent></MCheckbox>
+                    <MCheckbox @bind-value="searchModel.Deleted" TValue="bool" OnChange="onSearch" Style="margin-top:0%; padding:0%;"><LabelContent>已归档</LabelContent></MCheckbox>
                 </MCol>
                 <MCol Cols="12"
                       Sm="2"
@@ -170,7 +170,21 @@
                                       Sm="3"
                                       Md="3">
                                     <MSpacer></MSpacer>
-                                    <MTextField Label="入职日期"
+                                    @if (_enrollmentDate == DateOnly.MinValue)
+                                    {
+                                        <MTextField Label="入职日期"
+                                                    TValue="string"
+                                                    Value="@("yyyy-mm-dd")"
+                                                    Dense
+                                                    HideDetails="@("auto")"
+                                                    Readonly
+                                                    AppendIcon="mdi-calendar-range"
+                                                    OnMouseUp="() => _enrollC = true"
+                                                    OnAppendClick="() => _enrollC = true">
+                                        </MTextField>
+                                    }
+                                    else{
+                                        <MTextField Label="入职日期"
                                                 TValue="DateOnly"
                                                 ValidateOnBlur
                                                 Dense
@@ -181,21 +195,38 @@
                                                 OnMouseUp="() => _enrollC = true"
                                                 OnAppendClick="() => _enrollC = true">
                                     </MTextField>
+                                    }
                                 </MCol>
                                 <MCol Cols="12"
                                       Sm="3"
                                       Md="3">
-                                    <MTextField Label="合同到期日期"
-                                                TValue="DateOnly"
-                                                ValidateOnBlur
-                                                Dense
-                                                HideDetails="@("auto")"
-                                                @bind-Value="_expiryDate"
-                                                Readonly
-                                                AppendIcon="mdi-calendar-range"
-                                                OnMouseUp="() => _expiryC = true"
-                                                OnAppendClick="() => _expiryC = true">
-                                    </MTextField>
+                                    @if (_expiryDate == DateOnly.MinValue)
+                                    {
+                                        <MTextField Label="合同到期日期"
+                                                    TValue="string"
+                                                    Value="@("yyyy-mm-dd")"
+                                                    Dense
+                                                    HideDetails="@("auto")"
+                                                    Readonly
+                                                    AppendIcon="mdi-calendar-range"
+                                                    OnMouseUp="() => _expiryC = true"
+                                                    OnAppendClick="() => _expiryC = true">
+                                        </MTextField>
+                                    }
+                                    else
+                                    {
+                                        <MTextField Label="合同到期日期"
+                                                    TValue="DateOnly"
+                                                    ValidateOnBlur
+                                                    Dense
+                                                    HideDetails="@("auto")"
+                                                    @bind-Value="_expiryDate"
+                                                    Readonly
+                                                    AppendIcon="mdi-calendar-range"
+                                                    OnMouseUp="() => _expiryC = true"
+                                                    OnAppendClick="() => _expiryC = true">
+                                        </MTextField>
+                                    }
                                 </MCol>
                                 <MCol Cols="12"
                                       Sm="6"
@@ -270,6 +301,9 @@
                                                TItemValue="string"
                                                @bind-Value="mTeacher.Description"
                                                Filled
+                                               AutoGrow
+                                                BackgroundColor="rgb(0,0,0,0)"
+                                                Outlined
                                                Label="备注【选填】">
                                     </MTextarea>
                                 </MCol>
@@ -365,7 +399,7 @@
                    Class="mr-2">
                 mdi-delete
             </MIcon>
-                    删除
+                    归档
         </MButton>
                 </TopContent>
     <ItemColContent>
@@ -374,7 +408,7 @@
             
                 @if (context.Item.IsDeleted)
                 {
-                    <span>已删除</span>
+                    <span>已归档</span>
                 }
                 else if (context.Item.IsDeparted)
                 {
@@ -442,7 +476,7 @@
                                    Class="mr-0"
                                    Icon="@(" mdi-delete")">
                             </MIcon>
-                            <span>删除</span>
+                            <span>归档</span>
                         </MButton>
                     </MCol>
                 }
@@ -565,26 +599,57 @@
                         <MCol Cols="12"
                               Sm="3"
                               Md="3">
-                            <MTextField Label="入职日期"
-                                        TValue="DateOnly"
-                                        Dense
-                                        HideDetails="@("auto")"
-                                        @bind-Value="_enrollmentDate"
-                                        Readonly
-                                        AppendIcon="mdi-calendar-range">
-                            </MTextField>
+                            <MSpacer></MSpacer>
+                            @if (_enrollmentDate == DateOnly.MinValue)
+                            {
+                                <MTextField Label="入职日期"
+                                            TValue="string"
+                                            Value="@("yyyy-mm-dd")"
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range">
+                                </MTextField>
+                            }
+                            else
+                            {
+                                <MTextField Label="入职日期"
+                                            TValue="DateOnly"
+                                            ValidateOnBlur
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            @bind-Value="_enrollmentDate"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range">
+                                </MTextField>
+                            }
                         </MCol>
                         <MCol Cols="12"
                               Sm="3"
                               Md="3">
-                            <MTextField Label="合同到期日期"
-                                        TValue="DateOnly"
-                                        Dense
-                                        HideDetails="@("auto")"
-                                        @bind-Value="_expiryDate"
-                                        Readonly
-                                        AppendIcon="mdi-calendar-range">
-                            </MTextField>
+                            @if (_expiryDate == DateOnly.MinValue)
+                            {
+                                <MTextField Label="合同到期日期"
+                                            TValue="string"
+                                            Value="@("yyyy-mm-dd")"
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range">
+                                </MTextField>
+                            }
+                            else
+                            {
+                                <MTextField Label="合同到期日期"
+                                            TValue="DateOnly"
+                                            ValidateOnBlur
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            @bind-Value="_expiryDate"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range">
+                                </MTextField>
+                            }
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
@@ -657,6 +722,9 @@
                                        @bind-Value="mTeacher.Description"
                                        Filled
                                        Readonly
+                                   AutoGrow
+                                   BackgroundColor="rgb(0,0,0,0)"
+                                   Outlined
                                        Label="备注">
                             </MTextarea>
                         </MCol>
@@ -775,36 +843,65 @@
                         <MCol Cols="12"
                               Sm="3"
                               Md="3">
-                            <MTextField Label="入职日期"
-                                        TValue="DateOnly"
-                                        ValidateOnBlur
-                                        Dense
-                                        HideDetails="@("auto")"
-                                        @bind-Value="_enrollmentDate"
-                                        PersistentHint
-                                        Required
-                                        Readonly
-                                        RequiredMessage="请选择入职日期"
-                                        AppendIcon="mdi-calendar-range"
-                                        OnMouseUp="() => _enrollC=true"
-                                        OnAppendClick="() => _enrollC=true">
-                            </MTextField>
+                            <MSpacer></MSpacer>
+                            @if (_enrollmentDate == DateOnly.MinValue)
+                            {
+                                <MTextField Label="入职日期"
+                                            TValue="string"
+                                            Value="@("yyyy-mm-dd")"
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range"
+                                            OnMouseUp="() => _enrollC = true"
+                                            OnAppendClick="() => _enrollC = true">
+                                </MTextField>
+                            }
+                            else
+                            {
+                                <MTextField Label="入职日期"
+                                            TValue="DateOnly"
+                                            ValidateOnBlur
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            @bind-Value="_enrollmentDate"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range"
+                                            OnMouseUp="() => _enrollC = true"
+                                            OnAppendClick="() => _enrollC = true">
+                                </MTextField>
+                            }
                         </MCol>
                         <MCol Cols="12"
                               Sm="3"
                               Md="3">
-                            <MTextField Label="合同到期日期"
-                                        TValue="DateOnly"
-                                        Dense
-                                        HideDetails="@("auto")"
-                                        @bind-Value="_expiryDate"
-                                        Required
-                                        Readonly
-                                        RequiredMessage="请选择合同到期日期"
-                                        AppendIcon="mdi-calendar-range"
-                                        OnMouseUp="() => _expiryC=true"
-                                        OnAppendClick="() => _expiryC=true">
-                            </MTextField>
+                            @if (_expiryDate == DateOnly.MinValue)
+                            {
+                                <MTextField Label="合同到期日期"
+                                            TValue="string"
+                                            Value="@("yyyy-mm-dd")"
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range"
+                                            OnMouseUp="() => _expiryC = true"
+                                            OnAppendClick="() => _expiryC = true">
+                                </MTextField>
+                            }
+                            else
+                            {
+                                <MTextField Label="合同到期日期"
+                                            TValue="DateOnly"
+                                            ValidateOnBlur
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            @bind-Value="_expiryDate"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range"
+                                            OnMouseUp="() => _expiryC = true"
+                                            OnAppendClick="() => _expiryC = true">
+                                </MTextField>
+                            }
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
@@ -879,6 +976,9 @@
                                        TItemValue="string"
                                        @bind-Value="mTeacher.Description"
                                        Filled
+                                   AutoGrow
+                                   BackgroundColor="rgb(0,0,0,0)"
+                                   Outlined
                                        Label="备注【选填】">
                             </MTextarea>
                         </MCol>
@@ -959,29 +1059,60 @@
                         </MTextField>
                     </MCol>
                         <MCol Cols="12"
-                              Sm="6"
-                              Md="6">
-                            <MTextField Label="入职日期"
-                                        TValue="DateOnly"
-                                        Dense
-                                        HideDetails="@("auto")"
-                                        @bind-Value="_enrollmentDate"
-                                        Readonly
-                                        AppendIcon="mdi-calendar-range">
-                            </MTextField>
+                              Sm="3"
+                              Md="3">
+                            <MSpacer></MSpacer>
+                            @if (_enrollmentDate == DateOnly.MinValue)
+                            {
+                                <MTextField Label="入职日期"
+                                            TValue="string"
+                                            Value="@("yyyy-mm-dd")"
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range">
+                                </MTextField>
+                            }
+                            else
+                            {
+                                <MTextField Label="入职日期"
+                                            TValue="DateOnly"
+                                            ValidateOnBlur
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            @bind-Value="_enrollmentDate"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range">
+                                </MTextField>
+                            }
                         </MCol>
-                    <MCol Cols="12"
-                          Sm="6"
-                          Md="6">
-                        <MTextField Label="合同到期日期"
-                                    TValue="DateOnly"
-                                    Dense
-                                    HideDetails="@("auto")"
-                                    @bind-Value="_expiryDate"
-                                    Readonly
-                                    AppendIcon="mdi-calendar-range">
-                        </MTextField>
-                    </MCol>
+                        <MCol Cols="12"
+                              Sm="3"
+                              Md="3">
+                            @if (_expiryDate == DateOnly.MinValue)
+                            {
+                                <MTextField Label="合同到期日期"
+                                            TValue="string"
+                                            Value="@("yyyy-mm-dd")"
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range">
+                                </MTextField>
+                            }
+                            else
+                            {
+                                <MTextField Label="合同到期日期"
+                                            TValue="DateOnly"
+                                            ValidateOnBlur
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            @bind-Value="_expiryDate"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range">
+                                </MTextField>
+                            }
+                        </MCol>
                     </MRow>
             </MContainer>
                 <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
@@ -991,6 +1122,21 @@
                               Sm="6"
                               Md="6"
                               Style="margin-top:4%;">
+                            @if (_resignDate == DateOnly.MinValue)
+                            {
+                                <MTextField Label="离职日期"
+                                            TValue="string"
+                                            Value="@("yyyy-mm-dd")"
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range" 
+                                            OnMouseUp="() => _resignDateC=true"
+                                            OnAppendClick="() => _resignDateC=true">
+                                </MTextField>
+                            }
+                            else
+                            {
                             <MTextField Label="离职日期"
                                         TValue="DateOnly"
                                         ValidateOnBlur
@@ -1002,6 +1148,7 @@
                                         OnMouseUp="() => _resignDateC=true"
                                         OnAppendClick="() => _resignDateC=true">
                             </MTextField>
+                            }
                         </MCol>
                         <MCol Cols="12"
                               Sm="12"
@@ -1030,6 +1177,9 @@
                                        @bind-Value="mTeacher.Description"
                                        Filled
                                        HideDetails="@("auto")"
+                                   AutoGrow
+                                   BackgroundColor="rgb(0,0,0,0)"
+                                   Outlined
                                        Label="备注【选填】">
                             </MTextarea>
                         </MCol>
@@ -1167,6 +1317,9 @@
                                    @bind-Value="_groupDescription"
                                Filled
                                HideDetails="@("auto")"
+                                   AutoGrow
+                                   BackgroundColor="rgb(0,0,0,0)"
+                                   Outlined
                                    Label="备注【选填-注意：会添加到选中所有教师的备注！！】">
                     </MTextarea>
                 </MCol>
@@ -1213,10 +1366,10 @@
     </MCard>
 </MDialog>
 
-<!--删除用选框-->
+<!--归档用选框-->
 <MDialog @bind-Value="_DeleteC" MaxWidth="500">
     <MCard>
-        <MCardTitle Class="text-h5">你确定要删除该条教师信息：@mTeacher.Name ?</MCardTitle>
+        <MCardTitle Class="text-h5">你确定要归档该条教师信息：@mTeacher.Name ?</MCardTitle>
         <MForm Model="mTeacher" @bind-Value="_deleteValid" OnValidSubmit="DeleteConfirm" >
             <MCardText>
                 <MTextarea TValue="string"
@@ -1224,12 +1377,15 @@
                            @bind-Value="mTeacher.DeleteReason"
                            Filled
                            Required
-                           Label="删除原因">
+                           Label="归档原因">
                 </MTextarea>
                 <MTextarea TValue="string"
                            TItemValue="string"
                            @bind-Value="mTeacher.Description"
                            Filled
+                           AutoGrow
+                           BackgroundColor="rgb(0,0,0,0)"
+                           Outlined
                            Label="备注【选填】">
                 </MTextarea>
             </MCardText>
@@ -1257,7 +1413,7 @@
                 <ChildContent>
                     <MCard>
                         <MCardTitle>
-                            删除成功
+                            归档成功
                         </MCardTitle>
                         <MCardActions>
                             <MSpacer></MSpacer>
@@ -1273,10 +1429,10 @@
     </MCard>
 </MDialog>
 
-<!--批量删除用选框-->
+<!--批量归档用选框-->
 <MDialog @bind-Value="_DeleteGroupC" MaxWidth="500">
     <MCard>
-        <MCardTitle Class="text-h5">你确定要删除以下教师信息： @string.Join(", ", _selected.Select(t => t.Name)) ?</MCardTitle>
+        <MCardTitle Class="text-h5">你确定要归档以下教师信息： @string.Join(", ", _selected.Select(t => t.Name)) ?</MCardTitle>
         <MForm Model="_selected" @bind-Value="_deleteValid" OnValidSubmit="GroupDeleteConfirm">
             <MCardText>
                 <MTextarea TValue="string"
@@ -1284,12 +1440,15 @@
                            @bind-Value="_deleteReason"
                            Filled
                            Required
-                           Label="删除原因">
+                           Label="归档原因">
                 </MTextarea>
                 <MTextarea TValue="string"
                            TItemValue="string"
                            @bind-Value="_deleteDescription"
                            Filled
+                           AutoGrow
+                           BackgroundColor="rgb(0,0,0,0)"
+                           Outlined
                            Label="备注【选填-注意：会添加到所有选中教师的备注！！】">
                 </MTextarea>
             </MCardText>
@@ -1317,7 +1476,7 @@
                 <ChildContent>
                     <MCard>
                         <MCardTitle>
-                            删除成功
+                            归档成功
                         </MCardTitle>
                         <MCardActions>
                             <MSpacer></MSpacer>
@@ -1507,13 +1666,13 @@
     }
 
 
-    /*----------------删除教师信息----------------*/
+    /*----------------归档教师信息----------------*/
     private bool _DeleteC = false;
     private bool _deleteValid = false;
     private bool _deleteCompleteVisiable = false;
     private int _deleteButtonTime = 3;
 
-    // 删除窗口确认按钮限制
+    // 归档窗口确认按钮限制
     private async void DisableButtonTemporarily()
     {
         _deleteButtonTime = 3;
@@ -1527,7 +1686,7 @@
         StateHasChanged(); // 更新UI以启用按钮
     }
 
-    // 单人删除打开确认窗口
+    // 单人归档打开确认窗口
     private void DeleteTeacherForm(MTeacher teacher)
     {
         mTeacher = CopyUtil<MTeacher, MTeacher>.Trans(teacher);
@@ -1539,7 +1698,7 @@
         _expiryDate = DateOnly.FromDateTime(mTeacher.ExpiryDate);
     }
 
-    // 单人删除确认提交
+    // 单人归档确认提交
     private void DeleteConfirm()
     {
         List<MTeacher> list = new List<MTeacher> { mTeacher };
@@ -1554,7 +1713,7 @@
     private bool _DeleteGroupC = false;
     private bool _deleteGroupCompleteVisiable = false;
 
-    // 批量删除打开确认窗口
+    // 批量归档打开确认窗口
     private void GroupDeleteTeacherForm()
     {
         if (_selected.Count() == 0)
@@ -1573,13 +1732,13 @@
 
     }
 
-    // 批量删除确认提交
+    // 批量归档确认提交
     private void GroupDeleteConfirm()
     {
         if (string.IsNullOrEmpty(_deleteReason))
         {
 
-            _errorMessage = "请输入删除原因！";
+            _errorMessage = "请输入归档原因！";
             _errorVisiable = true;
             return;
         }
@@ -1588,7 +1747,7 @@
             foreach (var tc in _selected)
             {
                 tc.DeleteReason = _deleteReason;
-                tc.Description += "\n 批量删除备注：" + _deleteDescription;
+                tc.Description += "\n 批量归档备注：" + _deleteDescription;
             }
             List<MTeacher> list = _selected.ToList();
             _errorMessage = TeacherService.DeleteTeacher(list);

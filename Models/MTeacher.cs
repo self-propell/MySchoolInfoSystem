@@ -11,6 +11,12 @@ namespace SchPeoManageWeb.Models
         public int TeacherId { get; set; }
 
         /// <summary>
+        /// 教师职工号，唯一
+        /// </summary>
+        [Column("employee_id")]
+        public int? EmployeeID { get; set; }
+
+        /// <summary>
         /// 教师姓名
         /// </summary>
         [Column("name")]
@@ -20,25 +26,31 @@ namespace SchPeoManageWeb.Models
         /// 教师性别
         /// </summary>
         [Column("sex")]
-        public string Sex { get; set; }
+        public string? Sex { get; set; }
 
         /// <summary>
         /// 身份证号
         /// </summary>
         [Column("id_number")]
-        public string IdNumber { get; set; }
+        public string? IdNumber { get; set; }
+
+        /// <summary>
+        /// 年龄
+        /// </summary>
+        [Column("age")]
+        public string? Age { get; set; }
 
         /// <summary>
         /// 联系电话
         /// </summary>
         [Column("phone_number")]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         /// <summary>
         /// 联系邮箱地址
         /// </summary>
         [Column("email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         /// <summary>
         /// 就职日期【创建条目填写】

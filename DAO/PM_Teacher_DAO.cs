@@ -141,16 +141,20 @@ namespace SchPeoManageWeb.DAO
             try
             {
                 connection = SqlConnectionFactory.GetSession();
-                string sqlstr = "INSERT INTO PM_Teacher (name,sex,id_number,phone_number,email,enrollment_date,expiry_date,job_title,job_position,school_id,is_budgeted_posts,is_departed," +
+                string sqlstr = "INSERT INTO PM_Teacher (employee_id,name,sex,id_number,age,phone_number,email," +
+                    "enrollment_date,expiry_date,job_title,job_position,school_id,is_budgeted_posts,is_departed," +
                     "description,create_by,create_timestamp,update_by,update_timestamp,is_deleted) " +
-                    "VALUES (@name,@sex,@id_number,@phone_number,@email,@enrollment_date,@expiry_date,@job_title,@job_position,@school_id,@is_budgeted_posts,@is_departed," +
+                    "VALUES (@EmployeeID,@name,@sex,@id_number,@age,@phone_number,@email," +
+                    "@enrollment_date,@expiry_date,@job_title,@job_position,@school_id,@is_budgeted_posts,@is_departed," +
                     "@description,@create_by,@create_timestamp,0);";
                 SqlCommand command = new SqlCommand(sqlstr, connection);
+                command.Parameters.AddWithValue("@EmployeeID", teacher.EmployeeID.HasValue ? teacher.EmployeeID.Value : DBNull.Value);
                 command.Parameters.AddWithValue("@name", teacher.Name);
-                command.Parameters.AddWithValue("@sex", teacher.Sex);
-                command.Parameters.AddWithValue("@id_number", teacher.IdNumber);
-                command.Parameters.AddWithValue("@phone_number", teacher.PhoneNumber);
-                command.Parameters.AddWithValue("@email", teacher.Email);
+                command.Parameters.AddWithValue("@sex", teacher.Sex ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@id_number", teacher.IdNumber?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@age", teacher.IdNumber?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@phone_number", teacher.PhoneNumber ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@email", teacher.Email ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@enrollment_date", teacher.EnrollmentDate);
                 command.Parameters.AddWithValue("@expiry_date", teacher.ExpiryDate);
                 command.Parameters.AddWithValue("@job_title", teacher.JobTitle);
@@ -173,7 +177,7 @@ namespace SchPeoManageWeb.DAO
         }
 
         /// <summary>
-        /// 传入MTeacher，将其信息插入到数据库中
+        /// 传入MTeacher，将其信息更新到数据库中
         /// </summary>
         /// <param name="teacher"></param>
         /// <returns></returns>
