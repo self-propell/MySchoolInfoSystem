@@ -14,7 +14,7 @@ namespace SchPeoManageWeb.Models
         /// 教师职工号，唯一
         /// </summary>
         [Column("employee_id")]
-        public int? EmployeeID { get; set; }
+        public string EmployeeID { get; set; }
 
         /// <summary>
         /// 教师姓名
@@ -26,19 +26,19 @@ namespace SchPeoManageWeb.Models
         /// 教师性别
         /// </summary>
         [Column("sex")]
-        public string? Sex { get; set; }
+        public string Sex { get; set; }
 
         /// <summary>
         /// 身份证号
         /// </summary>
         [Column("id_number")]
-        public string? IdNumber { get; set; }
+        public string IdNumber { get; set; }
 
         /// <summary>
         /// 年龄
         /// </summary>
         [Column("age")]
-        public string? Age { get; set; }
+        public int Age { get; set; }
 
         /// <summary>
         /// 联系电话
@@ -68,13 +68,13 @@ namespace SchPeoManageWeb.Models
         /// 职称【教授/副教授等】
         /// </summary>
         [Column("job_title")]
-        public string JobTitle { get; set; }
+        public string? JobTitle { get; set; }
 
         /// <summary>
         /// 职位【院长/副院长等】
         /// </summary>
         [Column("job_position")]
-        public string JobPosition { get; set; }
+        public string? JobPosition { get; set; }
 
         /// <summary>
         /// 所属学院ID

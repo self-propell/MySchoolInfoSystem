@@ -146,19 +146,19 @@ namespace SchPeoManageWeb.DAO
                     "description,create_by,create_timestamp,update_by,update_timestamp,is_deleted) " +
                     "VALUES (@EmployeeID,@name,@sex,@id_number,@age,@phone_number,@email," +
                     "@enrollment_date,@expiry_date,@job_title,@job_position,@school_id,@is_budgeted_posts,@is_departed," +
-                    "@description,@create_by,@create_timestamp,0);";
+                    "@description,@create_by,@create_timestamp,@update_by,@update_timestamp,0);";
                 SqlCommand command = new SqlCommand(sqlstr, connection);
-                command.Parameters.AddWithValue("@EmployeeID", teacher.EmployeeID.HasValue ? teacher.EmployeeID.Value : DBNull.Value);
+                command.Parameters.AddWithValue("@EmployeeID", teacher.EmployeeID);
                 command.Parameters.AddWithValue("@name", teacher.Name);
                 command.Parameters.AddWithValue("@sex", teacher.Sex ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@id_number", teacher.IdNumber?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@age", teacher.IdNumber?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@id_number", teacher.IdNumber);
+                command.Parameters.AddWithValue("@age", teacher.Age);
                 command.Parameters.AddWithValue("@phone_number", teacher.PhoneNumber ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@email", teacher.Email ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@enrollment_date", teacher.EnrollmentDate);
-                command.Parameters.AddWithValue("@expiry_date", teacher.ExpiryDate);
-                command.Parameters.AddWithValue("@job_title", teacher.JobTitle);
-                command.Parameters.AddWithValue("@job_position", teacher.JobPosition);
+                command.Parameters.AddWithValue("@enrollment_date", teacher.EnrollmentDate==DateTime.MinValue? (object)DBNull.Value : teacher.EnrollmentDate);
+                command.Parameters.AddWithValue("@expiry_date", teacher.ExpiryDate == DateTime.MinValue ? (object)DBNull.Value : teacher.ExpiryDate);
+                command.Parameters.AddWithValue("@job_title", teacher.JobTitle?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@job_position", teacher.JobPosition ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@school_id", teacher.SchoolId);
                 command.Parameters.AddWithValue("@is_budgeted_posts", teacher.IsBudgetedPosts);
                 command.Parameters.AddWithValue("@is_departed", teacher.IsDeparted);
@@ -188,9 +188,12 @@ namespace SchPeoManageWeb.DAO
             {
                 connection = SqlConnectionFactory.GetSession();
                 string sqlstr = "UPDATE PM_Teacher " +
-                "SET name = @name, " +
+                "SET " +
+                " employee_id=@EmployeeID, " +
+                " name = @name, " +
                 " sex = @sex, " +
                 " id_number = @id_number, " +
+                " age = @age, " +
                 " phone_number = @phone_number, " +
                 " email = @email, " +
                 " enrollment_date = @enrollment_date, " +
@@ -204,16 +207,19 @@ namespace SchPeoManageWeb.DAO
                 " update_by = @update_by, " +
                 " update_timestamp = @update_timestamp" +
                 " WHERE teacher_id=@teacher_id;";
+
                 SqlCommand command = new SqlCommand(sqlstr, connection);
+                command.Parameters.AddWithValue("@EmployeeID", teacher.EmployeeID);
                 command.Parameters.AddWithValue("@name", teacher.Name);
-                command.Parameters.AddWithValue("@sex", teacher.Sex);
+                command.Parameters.AddWithValue("@sex", teacher.Sex ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@id_number", teacher.IdNumber);
-                command.Parameters.AddWithValue("@phone_number", teacher.PhoneNumber);
-                command.Parameters.AddWithValue("@email", teacher.Email);
-                command.Parameters.AddWithValue("@enrollment_date", teacher.EnrollmentDate);
-                command.Parameters.AddWithValue("@expiry_date", teacher.ExpiryDate);
-                command.Parameters.AddWithValue("@job_title", teacher.JobTitle);
-                command.Parameters.AddWithValue("@job_position", teacher.JobPosition);
+                command.Parameters.AddWithValue("@age", teacher.Age);
+                command.Parameters.AddWithValue("@phone_number", teacher.PhoneNumber ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@email", teacher.Email ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@enrollment_date", teacher.EnrollmentDate == DateTime.MinValue ? (object)DBNull.Value : teacher.EnrollmentDate);
+                command.Parameters.AddWithValue("@expiry_date", teacher.ExpiryDate == DateTime.MinValue ? (object)DBNull.Value : teacher.ExpiryDate);
+                command.Parameters.AddWithValue("@job_title", teacher.JobTitle ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@job_position", teacher.JobPosition ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@school_id", teacher.SchoolId);
                 command.Parameters.AddWithValue("@is_budgeted_posts", teacher.IsBudgetedPosts);
                 command.Parameters.AddWithValue("@is_departed", teacher.IsDeparted);
@@ -242,7 +248,7 @@ namespace SchPeoManageWeb.DAO
             {
                 connection = SqlConnectionFactory.GetSession();
                 string sqlstr = "UPDATE PM_Teacher " +
-                "SET departed_date=@depDate,departed_reason=@depReason,description=@des";
+                "SET departed_date=@depDate,departed_reason=@depReason,description=@des,update_by=@updateBy,update_timestamp=@updateTime";
 
 
                 if (mTeacher.DepartedDate <= DateTime.Now)
@@ -252,9 +258,11 @@ namespace SchPeoManageWeb.DAO
                 sqlstr += " WHERE teacher_id=@teacherID";
                 SqlCommand command = new SqlCommand(sqlstr, connection);
                 command.Parameters.AddWithValue("@depDate", mTeacher.DepartedDate);
-                command.Parameters.AddWithValue("@des", mTeacher.Description);
+                command.Parameters.AddWithValue("@des", mTeacher.Description??(Object)DBNull.Value);
                 command.Parameters.AddWithValue("@depReason", mTeacher.DepartedReason);
                 command.Parameters.AddWithValue("@teacherID", mTeacher.TeacherId);
+                command.Parameters.AddWithValue("@updateBy","Admin");
+                command.Parameters.AddWithValue("@updateTime", DateTime.Now);
                 command.ExecuteNonQuery();
             }
             catch (Exception)
@@ -286,7 +294,7 @@ namespace SchPeoManageWeb.DAO
                 connection = SqlConnectionFactory.GetSession();
                 transaction = connection.BeginTransaction();
                 string sqlstr = "UPDATE PM_Teacher " +
-                "SET departed_date=@depDate,departed_reason=@depReason,description=@des";
+                "SET departed_date=@depDate,departed_reason=@depReason,description=@des,update_by=@updateBy,update_timestamp=@updateTime";
                 foreach (MTeacher mt in mTeachers)
                 {
                     string psqlstr = sqlstr;
@@ -299,7 +307,9 @@ namespace SchPeoManageWeb.DAO
                     command.Parameters.AddWithValue("@depDate", mt.DepartedDate);
                     command.Parameters.AddWithValue("@depReason", mt.DepartedReason);
                     command.Parameters.AddWithValue("@teacherID", mt.TeacherId);
-                    command.Parameters.AddWithValue("@des", mt.Description);
+                    command.Parameters.AddWithValue("@des", mt.Description??(Object)DBNull.Value);
+                    command.Parameters.AddWithValue("@updateBy", "Admin");
+                    command.Parameters.AddWithValue("@updateTime", DateTime.Now);
                     command.ExecuteNonQuery();
                 }
                 transaction.Commit();
@@ -344,7 +354,7 @@ namespace SchPeoManageWeb.DAO
                     SqlCommand command = new SqlCommand(sqlstr, connection, transaction);
                     command.Parameters.AddWithValue("@teacherID", m.TeacherId);
                     command.Parameters.AddWithValue("@deleteBy","Admin");
-                    command.Parameters.AddWithValue("@des", m.Description);
+                    command.Parameters.AddWithValue("@des", m.Description ?? (Object)DBNull.Value);
                     
                     command.Parameters.AddWithValue("@deleteTime", DateTime.Now);
                     command.Parameters.AddWithValue("@deleteReason", m.DeleteReason);

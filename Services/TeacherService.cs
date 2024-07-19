@@ -94,15 +94,30 @@ namespace SchPeoManageWeb.Services
                 mTeacher.CreateTimestamp = DateTime.Now;
                 mTeacher.ReqTime = DateTime.Now;
                 mTeacher.CreateBy = "Admin";
-                mTeacher.JobPosition = mTeacher.JobPosition.Trim();
-                mTeacher.JobTitle = mTeacher.JobTitle.Trim();
+                // 计算age
+                string year = mTeacher.IdNumber.Substring(6, 4);
+                string month = mTeacher.IdNumber.Substring(10, 2);
+                string day = mTeacher.IdNumber.Substring(12, 2);
+                string birthdateString = $"{year}-{month}-{day}";
+                DateTime birthdate;
+                DateTime.TryParse(birthdateString, out birthdate);
+                int age = DateTime.Now.Year - birthdate.Year;
+                if (DateTime.Now < birthdate.AddYears(age))
+                {
+                    age--;
+                }
+                mTeacher.Age = age;
+                // 去除字符串空格
+                if(!string.IsNullOrEmpty(mTeacher.JobPosition)) mTeacher.JobPosition = mTeacher.JobPosition.Trim();
+                if (!string.IsNullOrEmpty(mTeacher.JobTitle)) mTeacher.JobTitle = mTeacher.JobTitle.Trim();
                 // 插入数据库
                 res = _teacherDAO.InsertTeacherInfo(mTeacher);
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return "在写入数据库时发生错误"; 
+                if (ex.Message.Contains("UNIQUE KEY")) return "该教职工号已被占用";
+                else return (ex.Message);
             }
             if (res == true) { return null; }
             else return "发生未知错误";
@@ -122,6 +137,19 @@ namespace SchPeoManageWeb.Services
                 mTeacher.UpdateTimestamp = DateTime.Now;
                 mTeacher.ReqTime = DateTime.Now;
                 mTeacher.UpdateBy = "Admin";
+                // 计算age
+                string year = mTeacher.IdNumber.Substring(6, 4);
+                string month = mTeacher.IdNumber.Substring(10, 2);
+                string day = mTeacher.IdNumber.Substring(12, 2);
+                string birthdateString = $"{year}-{month}-{day}";
+                DateTime birthdate;
+                DateTime.TryParse(birthdateString, out birthdate);
+                int age = DateTime.Now.Year - birthdate.Year;
+                if (DateTime.Now < birthdate.AddYears(age))
+                {
+                    age--;
+                }
+                mTeacher.Age = age;
                 // 插入数据库
                 res = _teacherDAO.UpdateTeacherInfo(mTeacher);
 
@@ -172,7 +200,11 @@ namespace SchPeoManageWeb.Services
             return null;
         }
 
-
+        /// <summary>
+        /// 传入List，删除其匹配的教师信息
+        /// </summary>
+        /// <param name="mTeacher"></param>
+        /// <returns></returns>
         public static string DeleteTeacher(List<MTeacher> mTeacher)
         {
             try
@@ -185,6 +217,15 @@ namespace SchPeoManageWeb.Services
                 return "在删除教师信息时出错";
             }
             return null;
+        }
+
+        /// <summary>
+        /// 获取一个可用的教职工号
+        /// </summary>
+        /// <returns></returns>
+        public static int GetEmployeeID()
+        {
+            return 1;
         }
     }
 }

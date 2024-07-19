@@ -45,8 +45,8 @@
                 <MCol Cols="12"
                       Sm="2"
                       Md="1"
-                    Style="padding:18px 12px 5px  5px;">
-                    <MCheckbox @bind-value="searchModel.Resigned" TValue="bool"  OnChange="onSearch" Style="margin-top:0%; padding:0%;"><LabelContent>已离职</LabelContent></MCheckbox>
+                      Style="padding:18px 12px 5px  5px;">
+                    <MCheckbox @bind-value="searchModel.Resigned" TValue="bool" OnChange="onSearch" Style="margin-top:0%; padding:0%;"><LabelContent>已离职</LabelContent></MCheckbox>
                 </MCol>
                 <MCol Cols="12"
                       Sm="2"
@@ -57,17 +57,16 @@
                 <MCol Cols="12"
                       Sm="2"
                       Md="2"
-                      Style="padding-top:13px;padding-bottom:0px;"
-                     >
+                      Style="padding-top:13px;padding-bottom:0px;">
                     <MButton OnClick="onSearch">
-                        <MIcon >mdi-card-search</MIcon>搜索
+                        <MIcon>mdi-card-search</MIcon>搜索
                     </MButton>
                 </MCol>
             </MRow>
         </MContainer>
     </MForm>
 </MCard>
-    
+
 <!--添加教师信息按钮呼出的表单-->
 <MRow Justify="JustifyTypes.Center">
     <MDialog @bind-Value="dialog"
@@ -83,15 +82,14 @@
                 <MForm Model="mTeacher" @bind-Value="_valid" OnValidSubmit="SubmitTeacherInfo">
                     <MCardText>
                         <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
-                <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                            <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
                             <MRow>
                                 <MCol Cols="12"
                                       Sm="6"
                                       Md="3">
-                                    <MTextField Label="姓名"
+                                    <MTextField Label="姓名*"
                                                 @bind-Value="mTeacher.Name"
                                                 TValue="string"
-                                                ValidateOnBlur
                                                 Autofocus
                                                 Rules="_nameRules"
                                                 HideDetails="@("auto")"
@@ -105,7 +103,7 @@
                                     <MSelect @bind-Value="mTeacher.Sex"
                                              Items="_genders"
                                              ItemText="r => r" ItemValue="r => r"
-                                             Label="性别"
+                                             Label="性别*"
                                              SingleLine
                                              Required
                                              RequiredMessage="请选择性别"
@@ -121,7 +119,6 @@
                                                 Type="number"
                                                 @bind-Value="mTeacher.PhoneNumber"
                                                 TValue="string"
-                                                ValidateOnBlur
                                                 Rules="_phoneRules"
                                                 NumberProps="@(prop => { prop.HideControl = true; })"
                                                 HideDetails="@("auto")"
@@ -132,12 +129,11 @@
                                 <MCol Cols="12"
                                       Sm="6"
                                       Md="6">
-                                    <MTextField Label="身份证号"
+                                    <MTextField Label="身份证号*"
                                                 @bind-Value="mTeacher.IdNumber"
                                                 TValue="string"
                                                 RequiredMessage="请输入身份证号"
                                                 Required
-                                                ValidateOnBlur
                                                 Rules="_idRules"
                                                 HideDetails="@("auto")"
                                                 Dense
@@ -150,22 +146,33 @@
                                     <MTextField Label="联系邮箱"
                                                 @bind-Value="mTeacher.Email"
                                                 TValue="string"
-                                                ValidateOnBlur
                                                 Rules="_mailRules"
                                                 PersistentHint
-                                                Required
-                                                RequiredMessage="请输入邮箱号"
                                                 HideDetails="@("auto")"
                                                 Dense
                                                 Outlined></MTextField>
                                 </MCol>
-                                </MRow>
-                                </MContainer>
+                            </MRow>
+                        </MContainer>
 
                         <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
                             <div style=" color: black; text-align: center; top:-13px;width: 110px; left: 3%; position: absolute; background: white;">就职信息</div>
-                                <MRow Style="margin-top:1%;">
-                                
+                            <MRow Style="margin-top:1%;">
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="教职工号*"
+                                                @bind-Value="mTeacher.EmployeeID"
+                                                TValue="string"
+                                                ValidateOnBlur
+                                                Rules="_empIDRules"
+                                                NumberProps="@(prop => { prop.HideControl = true; })"
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Required
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
                                 <MCol Cols="12"
                                       Sm="3"
                                       Md="3">
@@ -183,18 +190,19 @@
                                                     OnAppendClick="() => _enrollC = true">
                                         </MTextField>
                                     }
-                                    else{
+                                    else
+                                    {
                                         <MTextField Label="入职日期"
-                                                TValue="DateOnly"
-                                                ValidateOnBlur
-                                                Dense
-                                                HideDetails="@("auto")"
-                                                @bind-Value="_enrollmentDate"
-                                                Readonly
-                                                AppendIcon="mdi-calendar-range"
-                                                OnMouseUp="() => _enrollC = true"
-                                                OnAppendClick="() => _enrollC = true">
-                                    </MTextField>
+                                                    TValue="DateOnly"
+                                                    ValidateOnBlur
+                                                    Dense
+                                                    HideDetails="@("auto")"
+                                                    @bind-Value="_enrollmentDate"
+                                                    Readonly
+                                                    AppendIcon="mdi-calendar-range"
+                                                    OnMouseUp="() => _enrollC = true"
+                                                    OnAppendClick="() => _enrollC = true">
+                                        </MTextField>
                                     }
                                 </MCol>
                                 <MCol Cols="12"
@@ -230,21 +238,17 @@
                                 </MCol>
                                 <MCol Cols="12"
                                       Sm="6"
-                                      Md="6">
-                                    <MSelect Items="_allSchools"
-                                             TItem="MSchool"
-                                             TItemValue="int"
-                                             TValue="int"
-                                             @bind-Value="mTeacher.SchoolId"
-                                             Label="学院"
-                                             ItemValue="r => r.SchoolId"
-                                             ItemText="r => r.SchoolName"
+                                      Md="3">
+                                    <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
+                                             Items="_budget"
+                                             ItemText="r => r.ToString()"
+                                             ItemValue="r => r.Equals(yes)?true:false"
+                                             Label="是否有编制*"
                                              Required
-                                             RequiredMessage="请选择学院"
-                                             HideDetails="@("auto")"
+                                             RequiredMessage="请选择是否有编制"
                                              Dense
-                                             Outlined>
-                                    </MSelect>
+                                             HideDetails="@("auto")"
+                                             Outlined></MSelect>
                                 </MCol>
                                 <MCol Cols="12"
                                       Sm="6"
@@ -257,7 +261,6 @@
                                              Label="职称"
                                              ItemValue="r => r.Name"
                                              ItemText="r => r.Name"
-                                             Required
                                              RequiredMessage="请选择职称"
                                              HideDetails="@("auto")"
                                              Dense
@@ -270,71 +273,53 @@
                                     <MTextField TValue="string"
                                                 @bind-Value="mTeacher.JobPosition"
                                                 Label="职务"
-                                                Required
-                                                RequiredMessage="请输入职务"
+                                                RequiredMessage="请输入职务*"
                                                 Dense
                                                 HideDetails="@("auto")"
                                                 Outlined>
                                     </MTextField>
                                 </MCol>
                                 <MCol Cols="12"
-                                      Sm="3"
-                                      Md="6">
-
-                                    <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
-                                             Items="_budget"
-                                             ItemText="r => r.ToString()"
-                                             ItemValue="r => r.Equals(yes)?true:false"
-                                             Label="是否有编制"
-                                             Required
-                                             RequiredMessage="请选择是否有编制"
-                                             Dense
+                                      Sm="6"
+                                      Md="3">
+                                    <MSelect Items="_allSchools"
+                                             TItem="MSchool"
+                                             TItemValue="int"
+                                             TValue="int"
+                                             @bind-Value="mTeacher.SchoolId"
+                                             Label="学院"
+                                             ItemValue="r => r.SchoolId"
+                                             ItemText="r => r.SchoolName"
+                                             RequiredMessage="请选择学院"
                                              HideDetails="@("auto")"
-                                             Outlined></MSelect>
+                                             Dense
+                                             Outlined>
+                                    </MSelect>
                                 </MCol>
                             </MRow>
                         </MContainer>
                         <MRow Style="margin-top:1%;">
-                                <MCol Cols="12"
-                                      Sm="12">
-                                    <MTextarea TValue="string"
-                                               TItemValue="string"
-                                               @bind-Value="mTeacher.Description"
-                                               Filled
-                                               AutoGrow
-                                                BackgroundColor="rgb(0,0,0,0)"
-                                                Outlined
-                                               Label="备注【选填】">
-                                    </MTextarea>
-                                </MCol>
-                            </MRow>
-                                <MDialog @bind-Value="completeVisiable"
-                                         MaxWidth="600"
-                                         Persistent>
-                                    <ChildContent>
-                                        <MCard>
-                                            <MCardTitle>
-                                                信息新增成功
-                                            </MCardTitle>
-                                            <MCardActions>
-                                                <MSpacer></MSpacer>
-                                            <MButton Color="black"
-                                                         Text
-                                                         OnClick="() => {UpdateTeacherInfoInCache();completeVisiable = false;dialog=false;}">
-                                                    确认
-                                                </MButton>
-                                            </MCardActions>
-                                        </MCard>
-                                    </ChildContent>
-                                </MDialog>
+                            <MCol Cols="12"
+                                  Sm="12">
+                                <MTextarea TValue="string"
+                                           TItemValue="string"
+                                           @bind-Value="mTeacher.Description"
+                                           Filled
+                                           AutoGrow
+                                           BackgroundColor="rgb(0,0,0,0)"
+                                           Outlined
+                                           Label="备注">
+                                </MTextarea>
+                            </MCol>
+                        </MRow>
                     </MCardText>
                     <MCardActions>
+                        <div style="position:absolute;bottom:3%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
                         <MSpacer></MSpacer>
 
                         <MButton Color="black"
                                  Text
                                  Outlined
-                                 Disabled="!_valid"
                                  Type="submit">
                             保存
                         </MButton>
@@ -353,136 +338,125 @@
     </MDialog>
 </MRow>
 
+<!--通用成功弹窗-->
+<MDialog @bind-Value="completeVisiable"
+         MaxWidth="300">
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                信息新增成功
+            </MCardTitle>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Color="black"
+                         Text
+                         OnClick="() => {UpdateTeacherInfoInCache();completeVisiable = false;dialog=false;}">
+                    确认
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </ChildContent>
+</MDialog>
 
 <!--教师信息表格主体-->
 ﻿<MDataTable Headers="_headers"
-                Items="@showTeachers"
-                @bind-Value="_selected"
-                ItemKey="r => r.TeacherId.ToString()"
-                ItemsPerPage="10"
-                ShowSelect
-                SelectableKey="TeacherSelectable()"
-                Class="elevation-3 mt-5"
-                ResizeMode="_resizeMode"
-                >
-                <TopContent >
-                    <MSpacer></MSpacer>
-                <MButton Outlined
-                            Elevation="3"
-                            OnClick="AddTeacherInfo"
-                            Color="black"
-                            Class="ml-3 mt-3">
+             Items="@showTeachers"
+             @bind-Value="_selected"
+             ItemKey="r => r.TeacherId.ToString()"
+             ItemsPerPage="10"
+             ShowSelect
+             SelectableKey="TeacherSelectable()"
+             Class="elevation-3 mt-5"
+             ResizeMode="_resizeMode">
+    <TopContent>
+        <MSpacer></MSpacer>
+        <MButton Outlined
+                 Elevation="3"
+                 OnClick="AddTeacherInfo"
+                 Color="black"
+                 Class="ml-3 mt-3">
             <MIcon Left
                    Class="mr-2">
                 mdi-account-plus
             </MIcon>
-                    添加
-                </MButton>
-                <MButton Outlined
-                            Elevation="3"
-                            OnClick="GroupResignTeacherForm"
-                            Color="black"
-                            Class="ml-3 mt-3">
-                <MIcon 
-                        Left
-                       Class="mr-2">
-                    mdi-account-remove
-                </MIcon>
-                    离职
-                </MButton>
-                <MButton Outlined
-                            Elevation="3"
-                            OnClick="GroupDeleteTeacherForm"
-                            Color="black"
-                            Class="ml-3 mt-3">
-            <MIcon Left 
+            添加
+        </MButton>
+        <MButton Outlined
+                 Elevation="3"
+                 OnClick="GroupResignTeacherForm"
+                 Color="black"
+                 Class="ml-3 mt-3">
+            <MIcon Left
+                   Class="mr-2">
+                mdi-account-remove
+            </MIcon>
+            离职
+        </MButton>
+        <MButton Outlined
+                 Elevation="3"
+                 OnClick="GroupDeleteTeacherForm"
+                 Color="black"
+                 Class="ml-3 mt-3">
+            <MIcon Left
                    Class="mr-2">
                 mdi-delete
             </MIcon>
-                    归档
+            归档
         </MButton>
-                </TopContent>
+    </TopContent>
     <ItemColContent>
         @if (context.Header.Value == "States")
         {
-            
-                @if (context.Item.IsDeleted)
-                {
-                    <span>已归档</span>
-                }
-                else if (context.Item.IsDeparted)
-                {
-                    <span>已离职</span>
-                }
-                else
-                {
-                    <span>在职 </span>
-                }
-            
+            @if (context.Item.EnrollmentDate == DateTime.MinValue || context.Item.EnrollmentDate > DateTime.Now)
+            {
+                <span>未入职</span>
+            }
+            else if (context.Item.IsDeleted)
+            {
+                <span>已归档</span>
+            }
+            else if (context.Item.IsDeparted)
+            {
+                <span>已离职</span>
+            }
+            else if (context.Item.DepartedDate>DateTime.Today)
+            {
+                <span>在职[已办理离职]</span>
+            }
+            else
+            {
+                <span>在职 </span>
+            }
+
         }
         @if (context.Header.Value == "Actions")
         {
-            <MRow>
-                <MCol Sm="3" Lg="3">
-                    <MButton Outlined 
-                                OnClick="() => ReadTeacherForm(context.Item)"
-                                MaxWidth=25
-                                Depressed>
-                        <MIcon 
-                               Style="mr-0;"
-                               Icon="@("mdi:mdi-file")"
-                               Small>
-                        </MIcon>
-                        <span>查看</span>
-                    </MButton>
-                </MCol>
-                @if (context.Item.IsDeleted == false && context.Item.IsDeparted == false)
+            <MIcon Style="margin-right:3px;"
+                   title="查看"
+                   OnClick="() => ReadTeacherForm(context.Item)"
+                   Icon="@("mdi-file")">
+            </MIcon>
+            @if (context.Item.IsDeleted == false && context.Item.IsDeparted == false)
+            {
+                <MIcon Style="margin-right:3px;"
+                       title="编辑"
+                       OnClick="() => EditTeacherForm(context.Item)"
+                       Icon="@("mdi-pencil")">
+                </MIcon>
+                @if (context.Item.EnrollmentDate != DateTime.MinValue && context.Item.EnrollmentDate <= DateTime.Today)
                 {
-                    <MSpacer></MSpacer>
-                    <MCol Cols="15" Sm="3" Lg="3">
-                        <MButton Outlined
-                                 OnClick="() => EditTeacherForm(context.Item)"
-                                 MaxWidth=25
-                                 Depressed>
-                            <MIcon Small
-                                   Class="mr-0"
-                                   Icon="@("mdi-pencil")">
-
-                            </MIcon>
-                            <span>编辑</span>
-                        </MButton>
-                    </MCol>
-                    <MSpacer></MSpacer>
-                    <MCol Cols="15" Sm="3" Lg="3">
-                        <MButton Outlined
-                                 OnClick="() => ResignTeacherForm(context.Item)"
-                                 MaxWidth=25
-                                 Depressed>
-                            <MIcon Small
-                                   Class="mr-0"
-                                   Icon="@("mdi-account-remove")">
-
-                            </MIcon>
-                            <span>离职</span>
-                        </MButton>
-                    </MCol>
-                    <MSpacer></MSpacer>
-                    <MCol Cols="15" Sm="3" Lg="3">
-                        <MButton Outlined
-                                 OnClick="() => DeleteTeacherForm(context.Item)"
-                                 MaxWidth=25
-                                 Depressed>
-                            <MIcon Small
-                                   Class="mr-0"
-                                   Icon="@(" mdi-delete")">
-                            </MIcon>
-                            <span>归档</span>
-                        </MButton>
-                    </MCol>
+                    <MIcon OnClick="() => ResignTeacherForm(context.Item)"
+                           Style="margin-right:3px;"
+                           title="离职"
+                           Icon="@("mdi-account-remove")">
+                    </MIcon>
                 }
-                
-            </MRow>
 
+                <MIcon title="删除"
+                       OnClick="() => DeleteTeacherForm(context.Item)"
+                       Icon="@(" mdi-delete")">
+                </MIcon>
+            }
         }
         else
         {
@@ -493,19 +467,18 @@
 
 <!--通用报错弹窗-->
 <MDialog @bind-Value="_errorVisiable"
-             MaxWidth="600"
-            Persistent>
+         MaxWidth="400"
+         Persistent>
     <ChildContent>
         <MCard>
             <MCardTitle>
-                出错！
+                温馨提示：
             </MCardTitle>
             <MCardText>@_errorMessage</MCardText>
             <MCardActions>
                 <MSpacer></MSpacer>
-                <MButton 
-                            Text
-                            OnClick="() => {_errorMessage=null ;_errorVisiable = false;}">
+                <MButton Text
+                         OnClick="() => {_errorMessage=null ;_errorVisiable = false;}">
                     确认
                 </MButton>
             </MCardActions>
@@ -513,7 +486,7 @@
     </ChildContent>
 </MDialog>
 
-<!--读取用选框-->
+<!--查看用选框-->
 <MDialog @bind-Value="_readC"
          MaxWidth="900">
     <MCard>
@@ -521,21 +494,19 @@
             <span class="text-h5">教师信息</span>
         </MCardTitle>
         <MCardText>
-                <MForm Model="mTeacher">
+            <MForm Model="mTeacher">
                 <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
                     <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
                     <MRow>
                         <MCol Cols="12"
                               Sm="6"
                               Md="3">
-                            <MTextField Label="姓名"
+                            <MTextField Label="姓名*"
                                         @bind-Value="mTeacher.Name"
                                         TValue="string"
-                                        ValidateOnBlur
                                         Readonly
-                                        Dense
                                         HideDetails="@("auto")"
-                                        Rules="_nameRules"
+                                        Dense
                                         Outlined>
                             </MTextField>
                         </MCol>
@@ -545,11 +516,10 @@
                             <MSelect @bind-Value="mTeacher.Sex"
                                      Items="_genders"
                                      ItemText="r => r" ItemValue="r => r"
-                                     Label="性别"
-                                     SingleLine
+                                     Label="性别*"
                                      Readonly
-                                     Dense
                                      HideDetails="@("auto")"
+                                     Dense
                                      Outlined></MSelect>
 
                         </MCol>
@@ -559,24 +529,23 @@
                             <MTextField Label="联系电话"
                                         Type="number"
                                         @bind-Value="mTeacher.PhoneNumber"
-                                        Readonly
                                         TValue="string"
-                                        Dense
-                                        HideDetails="@("auto")"
+                                        Readonly
                                         NumberProps="@(prop => { prop.HideControl = true; })"
+                                        HideDetails="@("auto")"
+                                        Dense
                                         Outlined>
                             </MTextField>
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
                               Md="6">
-                            <MTextField Label="身份证号"
+                            <MTextField Label="身份证号*"
                                         @bind-Value="mTeacher.IdNumber"
                                         TValue="string"
                                         Readonly
-                                        Dense
-                                        Rules="_idRules"
                                         HideDetails="@("auto")"
+                                        Dense
                                         Outlined>
                             </MTextField>
                         </MCol>
@@ -586,16 +555,30 @@
                             <MTextField Label="联系邮箱"
                                         @bind-Value="mTeacher.Email"
                                         TValue="string"
-                                        Dense
                                         Readonly
                                         HideDetails="@("auto")"
+                                        Dense
                                         Outlined></MTextField>
                         </MCol>
-                        </MRow>
-                        </MContainer>
-            <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
-                <div style=" color: black; text-align: center; top:-13px;width: 110px; left: 3%; position: absolute; background: white;">就职信息</div>
+                    </MRow>
+                </MContainer>
+
+                <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
+                    <div style=" color: black; text-align: center; top:-13px;width: 110px; left: 3%; position: absolute; background: white;">就职信息</div>
                     <MRow Style="margin-top:1%;">
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
+                            <MTextField Label="教职工号*"
+                                        @bind-Value="mTeacher.EmployeeID"
+                                        TValue="string"
+                                        Readonly
+                                        NumberProps="@(prop => { prop.HideControl = true; })"
+                                        HideDetails="@("auto")"
+                                        Dense
+                                        Outlined>
+                            </MTextField>
+                        </MCol>
                         <MCol Cols="12"
                               Sm="3"
                               Md="3">
@@ -653,94 +636,83 @@
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
-                              Md="6">
-                            <MSelect Items="_allSchools"
-                                     TItem="MSchool"
-                                     TItemValue="int"
-                                     TValue="int"
-                                     @bind-Value="mTeacher.SchoolId"
+                              Md="3">
+                            <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
+                                     Items="_budget"
+                                     ItemText="r => r.ToString()"
+                                     ItemValue="r => r.Equals(yes)?true:false"
+                                     Label="是否有编制*"
                                      Readonly
-                                     Label="学院"
                                      Dense
                                      HideDetails="@("auto")"
-                                     ItemValue="r => r.SchoolId"
-                                     ItemText="r => r.SchoolName"
-                                     Outlined>
-                            </MSelect>
+                                     Outlined></MSelect>
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
                               Md="3">
-                            <MSelect TItem="MData"
-                                     TValue="string"
-                                     TItemValue="string"
-                                     Items="_jobTitleItems"
-                                     @bind-Value="mTeacher.JobTitle"
-                                     Label="职称"
-                                     Readonly
-                                     Dense
-                                     HideDetails="@("auto")"
-                                     ItemValue="r => r.Name"
-                                     ItemText="r => r.Name"
-                                     Outlined>
-                            </MSelect>
+                            <MTextField TValue="string"
+                                        @bind-Value="mTeacher.JobTitle"
+                                        Label="职称"
+                                        Readonly
+                                        HideDetails="@("auto")"
+                                        Dense
+                                        Outlined>
+                            </MTextField>
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
                               Md="3">
                             <MTextField TValue="string"
                                         @bind-Value="mTeacher.JobPosition"
-                                        Readonly
-                                        Dense
                                         Label="职务"
+                                        Dense
+                                        Readonly
                                         HideDetails="@("auto")"
                                         Outlined>
                             </MTextField>
                         </MCol>
                         <MCol Cols="12"
-                              Sm="3"
-                              Md="6">
-
-                            <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
-                                     Items="_budget"
-                                     ItemText="r => r.ToString()"
-                                     ItemValue="r => r.Equals(yes)?true:false"
-                                     Label="是否有编制"
-                                     Dense
-                                     HideDetails="@("auto")"
-                                     Readonly
-                                     Outlined></MSelect>
+                              Sm="6"
+                              Md="3">
+                            <MTextField TValue="string"
+                                        @bind-Value="mTeacher.SchoolName"
+                                        Label="学院"
+                                        Readonly
+                                        HideDetails="@("auto")"
+                                        Dense
+                                        Outlined>
+                            </MTextField>
                         </MCol>
-                        </MRow>
-                        </MContainer>
-                <MRow Style="margin-top:1%;">
 
-                        <MCol Cols="12"
-                              Sm="12">
-                            <MTextarea TValue="string"
-                                       TItemValue="string"
-                                       @bind-Value="mTeacher.Description"
-                                       Filled
-                                       Readonly
+
+                    </MRow>
+                </MContainer>
+                <MRow Style="margin-top:1%;">
+                    <MCol Cols="12"
+                          Sm="12">
+                        <MTextarea TValue="string"
+                                   TItemValue="string"
+                                   @bind-Value="mTeacher.Description"
+                                   Filled
                                    AutoGrow
+                                   Readonly
                                    BackgroundColor="rgb(0,0,0,0)"
                                    Outlined
-                                       Label="备注">
-                            </MTextarea>
-                        </MCol>
-                    </MRow>
-                    <MCardActions>
-                        <MSpacer></MSpacer>
-                        <MButton 
-                                 Outlined
-                                 Text
-                                 OnClick="() => _readC = false">
-                            关闭
-                        </MButton>
-                        <MSpacer></MSpacer>
-                    </MCardActions>
-                
-            
+                                   Label="备注">
+                        </MTextarea>
+                    </MCol>
+                </MRow>
+                <MCardActions>
+                    <MSpacer></MSpacer>
+                    <MButton Outlined
+                             Text
+                             OnClick="() => _readC = false">
+                        关闭
+                    </MButton>
+                    <MSpacer></MSpacer>
+                </MCardActions>
+
+
             </MForm>
         </MCardText>
     </MCard>
@@ -755,21 +727,21 @@
         </MCardTitle>
 
         <MCardText>
-            
-                <MForm Model="mTeacher" @bind-Value="_editValid" OnValidSubmit="UpdateTeacherInfo">
-                               <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
-                <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+
+            <MForm Model="mTeacher" @bind-Value="_editValid" OnValidSubmit="UpdateTeacherInfo">
+                <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                    <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
                     <MRow>
                         <MCol Cols="12"
                               Sm="6"
                               Md="3">
-                            <MTextField Label="姓名"
+                            <MTextField Label="姓名*"
                                         @bind-Value="mTeacher.Name"
                                         TValue="string"
-                                        ValidateOnBlur
+                                        Autofocus
                                         Rules="_nameRules"
-                                        Dense
                                         HideDetails="@("auto")"
+                                        Dense
                                         Outlined>
                             </MTextField>
                         </MCol>
@@ -779,12 +751,12 @@
                             <MSelect @bind-Value="mTeacher.Sex"
                                      Items="_genders"
                                      ItemText="r => r" ItemValue="r => r"
-                                     Label="性别"
+                                     Label="性别*"
                                      SingleLine
                                      Required
-                                        Dense
-                                        HideDetails="@("auto")"
                                      RequiredMessage="请选择性别"
+                                     HideDetails="@("auto")"
+                                     Dense
                                      Outlined></MSelect>
 
                         </MCol>
@@ -795,28 +767,24 @@
                                         Type="number"
                                         @bind-Value="mTeacher.PhoneNumber"
                                         TValue="string"
-                                        ValidateOnBlur
                                         Rules="_phoneRules"
+                                        NumberProps="@(prop => { prop.HideControl = true; })"
                                         HideDetails="@("auto")"
                                         Dense
-                                        NumberProps="@(prop => { prop.HideControl = true; })"
-                                        Required
-                                        RequiredMessage="请输入联系电话"
                                         Outlined>
                             </MTextField>
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
                               Md="6">
-                            <MTextField Label="身份证号"
+                            <MTextField Label="身份证号*"
                                         @bind-Value="mTeacher.IdNumber"
                                         TValue="string"
-                                        ValidateOnBlur
-                                        Rules="_idRules"
-                                        Dense
-                                        HideDetails="@("auto")"
+                                        RequiredMessage="请输入身份证号"
                                         Required
-                                        RequiredMessage="请输入教师身份证号"
+                                        Rules="_idRules"
+                                        HideDetails="@("auto")"
+                                        Dense
                                         Outlined>
                             </MTextField>
                         </MCol>
@@ -826,20 +794,32 @@
                             <MTextField Label="联系邮箱"
                                         @bind-Value="mTeacher.Email"
                                         TValue="string"
-                                        ValidateOnBlur
                                         Rules="_mailRules"
-                                        Dense
-                                        HideDetails="@("auto")"
                                         PersistentHint
-                                        Required
-                                        RequiredMessage="请输入邮箱号"
+                                        HideDetails="@("auto")"
+                                        Dense
                                         Outlined></MTextField>
                         </MCol>
-                        </MRow>
-                        </MContainer>
-                        <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
-                            <div style=" color: black; text-align: center; top:-13px;width: 110px; left: 3%; position: absolute; background: white;">就职信息</div>
-                            <MRow Style="margin-top:1%">
+                    </MRow>
+                </MContainer>
+
+                <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
+                    <div style=" color: black; text-align: center; top:-13px;width: 110px; left: 3%; position: absolute; background: white;">就职信息</div>
+                    <MRow Style="margin-top:1%;">
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
+                            <MTextField Label="教职工号*"
+                                        @bind-Value="mTeacher.EmployeeID"
+                                        TValue="string"
+                                        Rules="_empIDRules"
+                                        NumberProps="@(prop => { prop.HideControl = true; })"
+                                        HideDetails="@("auto")"
+                                        Dense
+                                        Required
+                                        Outlined>
+                            </MTextField>
+                        </MCol>
                         <MCol Cols="12"
                               Sm="3"
                               Md="3">
@@ -861,7 +841,6 @@
                             {
                                 <MTextField Label="入职日期"
                                             TValue="DateOnly"
-                                            ValidateOnBlur
                                             Dense
                                             HideDetails="@("auto")"
                                             @bind-Value="_enrollmentDate"
@@ -892,7 +871,6 @@
                             {
                                 <MTextField Label="合同到期日期"
                                             TValue="DateOnly"
-                                            ValidateOnBlur
                                             Dense
                                             HideDetails="@("auto")"
                                             @bind-Value="_expiryDate"
@@ -905,21 +883,17 @@
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
-                              Md="6">
-                            <MSelect Items="_allSchools"
-                                     TItem="MSchool"
-                                     TItemValue="int"
-                                     TValue="int"
-                                     @bind-Value="mTeacher.SchoolId"
+                              Md="3">
+                            <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
+                                     Items="_budget"
+                                     ItemText="r => r.ToString()"
+                                     ItemValue="r => r.Equals(yes)?true:false"
+                                     Label="是否有编制*"
+                                     Required
+                                     RequiredMessage="请选择是否有编制"
                                      Dense
                                      HideDetails="@("auto")"
-                                     Label="学院"
-                                     ItemValue="r => r.SchoolId"
-                                     ItemText="r => r.SchoolName"
-                                     Required
-                                     RequiredMessage="请选择学院"
-                                     Outlined>
-                            </MSelect>
+                                     Outlined></MSelect>
                         </MCol>
                         <MCol Cols="12"
                               Sm="6"
@@ -930,12 +904,11 @@
                                      Items="_jobTitleItems"
                                      @bind-Value="mTeacher.JobTitle"
                                      Label="职称"
-                                     Dense
-                                     HideDetails="@("auto")"
                                      ItemValue="r => r.Name"
                                      ItemText="r => r.Name"
-                                     Required
                                      RequiredMessage="请选择职称"
+                                     HideDetails="@("auto")"
+                                     Dense
                                      Outlined>
                             </MSelect>
                         </MCol>
@@ -945,122 +918,127 @@
                             <MTextField TValue="string"
                                         @bind-Value="mTeacher.JobPosition"
                                         Label="职务"
-                                        Required
+                                        RequiredMessage="请输入职务*"
                                         Dense
                                         HideDetails="@("auto")"
-                                        RequiredMessage="请输入职务"
                                         Outlined>
                             </MTextField>
                         </MCol>
                         <MCol Cols="12"
-                              Sm="3"
-                              Md="6">
-
-                            <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
-                                     Items="_budget"
-                                     ItemText="r => r.ToString()"
-                                     ItemValue="r => r.Equals(yes)?true:false"
-                                     Label="是否有编制"
-                                     Required
-                                     Dense
+                              Sm="6"
+                              Md="3">
+                            <MSelect Items="_allSchools"
+                                     TItem="MSchool"
+                                     TItemValue="int"
+                                     TValue="int"
+                                     @bind-Value="mTeacher.SchoolId"
+                                     Label="学院"
+                                     ItemValue="r => r.SchoolId"
+                                     ItemText="r => r.SchoolName"
+                                     RequiredMessage="请选择学院"
                                      HideDetails="@("auto")"
-                                     RequiredMessage="请选择是否有编制"
-                                     Outlined></MSelect>
+                                     Dense
+                                     Outlined>
+                            </MSelect>
                         </MCol>
+
+
                     </MRow>
                 </MContainer>
                 <MRow Style="margin-top:1%;">
-                        <MCol Cols="12"
-                              Sm="12">
-                            <MTextarea TValue="string"
-                                       TItemValue="string"
-                                       @bind-Value="mTeacher.Description"
-                                       Filled
+                    <MCol Cols="12"
+                          Sm="12">
+                        <MTextarea TValue="string"
+                                   TItemValue="string"
+                                   @bind-Value="mTeacher.Description"
+                                   Filled
                                    AutoGrow
                                    BackgroundColor="rgb(0,0,0,0)"
                                    Outlined
-                                       Label="备注【选填】">
-                            </MTextarea>
-                        </MCol>
-                    </MRow>
-                    <MCardActions>
-                        <MSpacer></MSpacer>
+                                   Label="备注">
+                        </MTextarea>
+                    </MCol>
+                </MRow>
+                <MCardActions>
+                    <div style="position:absolute;bottom:6%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                    <MSpacer></MSpacer>
 
-                        <MButton Color="black"
-                                 Text
-                                 Outlined
-                                 Type="submit">
-                            保存
-                        </MButton>
-                        <MButton Color="black"
-                                 Outlined
-                                 Text
-                                 OnClick="() => _editC = false">
-                            取消
-                        </MButton>
-                        <MSpacer></MSpacer>
-                    </MCardActions>
-                </MForm>
-                <MDialog @bind-Value="_editCompleteVisiable"
-                         MaxWidth="600"
-                         Persistent>
-                    <ChildContent>
-                        <MCard>
-                            <MCardTitle>
-                                信息修改成功
-                            </MCardTitle>
-                            <MCardActions>
-                                <MSpacer></MSpacer>
-                                <MButton Color="black"
-                                         Text
-                                         OnClick="()=> {UpdateTeacherInfoInCache(); _editCompleteVisiable = false; _editC = false; }">
-                                    确认
-                                </MButton>
-                            </MCardActions>
-                        </MCard>
-                    </ChildContent>
-                </MDialog>
-            
+                    <MButton Color="black"
+                             Text
+                             Outlined
+                             Type="submit">
+                        保存
+                    </MButton>
+                    <MButton Color="black"
+                             Outlined
+                             Text
+                             OnClick="() => _editC = false">
+                        取消
+                    </MButton>
+                    <MSpacer></MSpacer>
+                </MCardActions>
+            </MForm>
+            <MDialog @bind-Value="_editCompleteVisiable"
+                     MaxWidth="400">
+                <ChildContent>
+                    <MCard>
+                        <MCardTitle>
+                            信息修改成功
+                        </MCardTitle>
+                        <MCardActions>
+                            <MSpacer></MSpacer>
+                            <MButton Color="black"
+                                     Text
+                                     OnClick="()=> {UpdateTeacherInfoInCache(); _editCompleteVisiable = false; _editC = false; }">
+                                确认
+                            </MButton>
+                        </MCardActions>
+                    </MCard>
+                </ChildContent>
+            </MDialog>
+
         </MCardText>
     </MCard>
 </MDialog>
 
-<!--离职办理用选框-->
+<!--离职用选框-->
 <MDialog @bind-Value="_resignC" MaxWidth="600">
     <MCard>
         <MForm Model="mTeacher" @bind-Value="_resignValid" OnValidSubmit="ResignTeacherSubmit">
-        <MCardTitle Class="text-h5">为 @mTeacher.Name 办理离职</MCardTitle>
-        <MCardText>
+            <MCardTitle Class="text-h5">为 @mTeacher.Name 办理离职</MCardTitle>
+            <MCardText>
                 <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
-                <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
-                <MRow Style="margin-top:3;">
-                    <MCol Cols="12"
-                          Sm="6"
-                          Md="6"
-                          Style="margin-top:4%;">
-                        <MTextField Label="教职工号"
-                                    TValue="int"
-                                    Dense
-                                    HideDetails="@("auto")"
-                                    @bind-Value="mTeacher.TeacherId"
-                                    Readonly>
-                        </MTextField>
-                    </MCol>
-                    <MCol Cols="12"
-                          Sm="6"
-                          Md="6"
-                              Style="margin-top:4%;">
-                        <MTextField Label="姓名"
-                                    TValue="string"
-                                    Dense
-                                    HideDetails="@("auto")"
-                                    @bind-Value="mTeacher.Name"
-                                    Readonly>
-                        </MTextField>
-                    </MCol>
+                    <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                    <MRow Style="margin-top:3;">
                         <MCol Cols="12"
-                              Sm="3"
-                              Md="3">
+                              Sm="6"
+                              Md="6"
+                              Style="margin-top:4%;">
+                            <MTextField Label="教职工号"
+                                        TValue="string"
+                                        Dense
+                                        HideDetails="@("auto")"
+                                        @bind-Value="mTeacher.EmployeeID"
+                                        Outlined
+                                        Readonly>
+                            </MTextField>
+                        </MCol>
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6"
+                              Style="margin-top:4%;">
+                            <MTextField Label="姓名"
+                                        TValue="string"
+                                        Dense
+                                        HideDetails="@("auto")"
+                                        @bind-Value="mTeacher.Name"
+                                        Outlined
+                                        Readonly>
+                            </MTextField>
+                        </MCol>
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
                             <MSpacer></MSpacer>
                             @if (_enrollmentDate == DateOnly.MinValue)
                             {
@@ -1077,7 +1055,6 @@
                             {
                                 <MTextField Label="入职日期"
                                             TValue="DateOnly"
-                                            ValidateOnBlur
                                             Dense
                                             HideDetails="@("auto")"
                                             @bind-Value="_enrollmentDate"
@@ -1087,8 +1064,8 @@
                             }
                         </MCol>
                         <MCol Cols="12"
-                              Sm="3"
-                              Md="3">
+                              Sm="6"
+                              Md="6">
                             @if (_expiryDate == DateOnly.MinValue)
                             {
                                 <MTextField Label="合同到期日期"
@@ -1104,7 +1081,6 @@
                             {
                                 <MTextField Label="合同到期日期"
                                             TValue="DateOnly"
-                                            ValidateOnBlur
                                             Dense
                                             HideDetails="@("auto")"
                                             @bind-Value="_expiryDate"
@@ -1114,7 +1090,7 @@
                             }
                         </MCol>
                     </MRow>
-            </MContainer>
+                </MContainer>
                 <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
                     <div style=" color: black; text-align: center; top:-13px;width: 110px; left: 3%; position: absolute; background: white;">离职信息</div>
                     <MRow>
@@ -1124,70 +1100,70 @@
                               Style="margin-top:4%;">
                             @if (_resignDate == DateOnly.MinValue)
                             {
-                                <MTextField Label="离职日期"
+                                <MTextField Label="离职日期*"
                                             TValue="string"
                                             Value="@("yyyy-mm-dd")"
                                             Dense
                                             HideDetails="@("auto")"
                                             Readonly
-                                            AppendIcon="mdi-calendar-range" 
+                                            AppendIcon="mdi-calendar-range"
                                             OnMouseUp="() => _resignDateC=true"
                                             OnAppendClick="() => _resignDateC=true">
                                 </MTextField>
                             }
                             else
                             {
-                            <MTextField Label="离职日期"
-                                        TValue="DateOnly"
-                                        ValidateOnBlur
-                                        Dense
-                                        HideDetails="@("auto")"
-                                        @bind-Value="_resignDate"
-                                        Readonly
-                                        AppendIcon="mdi-calendar-range"
-                                        OnMouseUp="() => _resignDateC=true"
-                                        OnAppendClick="() => _resignDateC=true">
-                            </MTextField>
+                                <MTextField Label="离职日期*"
+                                            TValue="DateOnly"
+                                            Dense
+                                            HideDetails="@("auto")"
+                                            @bind-Value="_resignDate"
+                                            Readonly
+                                            AppendIcon="mdi-calendar-range"
+                                            OnMouseUp="() => _resignDateC=true"
+                                            OnAppendClick="() => _resignDateC=true">
+                                </MTextField>
                             }
                         </MCol>
                         <MCol Cols="12"
                               Sm="12"
                               Md="12"
-                                Style="mb-0;pb-0">
+                              Style="mb-0;pb-0">
                             <MTextarea TValue="string"
                                        TItemValue="string"
                                        @bind-Value="mTeacher.DepartedReason"
                                        Filled
                                        Required
+                                       Outlined
+                                       BackgroundColor="rgba(0,0,0,0)"
                                        RequiredMessage="请输入教师离职原因"
                                        HideDetails="@("auto")"
-                                       Label="离职原因">
+                                       Label="离职原因*">
                             </MTextarea>
                         </MCol>
                     </MRow>
                 </MContainer>
                 <MRow Style="margin-top:1%;">
-                        <MCol Cols="12"
-                              Sm="12"
-                              Md="12"
-                              Style="mt-0;pt-0">
-                            <MTextarea TValue="string"
-                                       TItemValue="string"
-                                       Style="mt-1"
-                                       @bind-Value="mTeacher.Description"
-                                       Filled
-                                       HideDetails="@("auto")"
+                    <MCol Cols="12"
+                          Sm="12"
+                          Md="12"
+                          Style="mt-0;pt-0">
+                        <MTextarea TValue="string"
+                                   TItemValue="string"
+                                   Style="mt-1"
+                                   @bind-Value="mTeacher.Description"
+                                   Filled
+                                   HideDetails="@("auto")"
                                    AutoGrow
                                    BackgroundColor="rgb(0,0,0,0)"
                                    Outlined
-                                       Label="备注【选填】">
-                            </MTextarea>
-                        </MCol>
-                    </MRow>
-                
+                                   Label="备注">
+                        </MTextarea>
+                    </MCol>
+                </MRow>
+
                 <MDialog @bind-Value="_resignCompleteVisiable"
-                         MaxWidth="600"
-                         Persistent>
+                         MaxWidth="400">
                     <ChildContent>
                         <MCard>
                             <MCardTitle>
@@ -1204,24 +1180,25 @@
                         </MCard>
                     </ChildContent>
                 </MDialog>
-        </MCardText>
-        <MCardActions>
-            <MSpacer></MSpacer>
-            <MButton Color="black"
-                     Text
-                     Outlined
-                     Disabled="!_resignValid"
-                     Type="submit">
-                保存
-            </MButton>
+            </MCardText>
+            <MCardActions>
+                <div style="position:absolute;bottom:2%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                <MSpacer></MSpacer>
+                <MButton Color="black"
+                         Text
+                         Outlined
+                         Disabled="!_resignValid"
+                         Type="submit">
+                    保存
+                </MButton>
                 <MButton Color="black"
                          Outlined
                          Text
                          OnClick="() => _resignC = false">
                     取消
                 </MButton>
-            <MSpacer></MSpacer>
-        </MCardActions>
+                <MSpacer></MSpacer>
+            </MCardActions>
         </MForm>
     </MCard>
 </MDialog>
@@ -1229,218 +1206,377 @@
 <!--批量离职办理用选框-->
 <MDialog @bind-Value="_groupResignC" MaxWidth="500">
     <MCard>
-        
-            <MCardTitle Class="text-h5">为 @string.Join(", ", _selected.Select(t => t.Name)) 办理离职</MCardTitle>
-            <MCardText>
-                <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
-                    <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
-                    <MRow Style="margin-top:3;">
-                        
+        <MCardTitle Class="text-h5">批量办理离职</MCardTitle>
+        <MCardText>
+            <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                <MRow Style="margin-top:2%;">
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="6">
+                        <MMenu OpenOnHover OffsetY>
+                            <ActivatorContent>
+                                <MButton @attributes="@context.Attrs">名称列表</MButton>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <MList>
+                                    @foreach (var item in _selected.ToList())
+                                    {
+                                        <MListItem>
+                                            <MListItemContent>
+                                                <MListItemTitle>
+                                                    @item.Name
+                                                </MListItemTitle>
+                                            </MListItemContent>
+                                        </MListItem>
+                                    }
+                                </MList>
+                            </ChildContent>
+                        </MMenu>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="6">
+                        <MMenu OpenOnHover OffsetY>
+                            <ActivatorContent>
+                                <MButton @attributes="@context.Attrs">职工号列表</MButton>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <MList>
+                                    @foreach (var item in _selected.ToList())
+                                    {
+                                        <MListItem>
+                                            <MListItemContent>
+                                                <MListItemTitle>
+                                                    @item.TeacherId
+                                                </MListItemTitle>
+                                            </MListItemContent>
+                                        </MListItem>
+                                    }
+                                </MList>
+                            </ChildContent>
+                        </MMenu>
+                    </MCol>
+                </MRow>
+            </MContainer>
+            <MForm Model="_selected" @bind-Value="_groupResignValid" OnValidSubmit="GroupResignTeacherSubmit">
+                <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
+                    <div style=" color: black; text-align: center; top:-13px;width: 110px; left: 3%; position: absolute; background: white;">离职信息</div>
+                    <MRow>
                         <MCol Cols="12"
                               Sm="6"
-                              Md="6">
-                        <MHover >
-                                <MSelect Label="名称列表"
-                                         TItem="MTeacher"
-                                         TValue="string"
-                                         TItemValue="string"
-                                         Items="_selected.ToList()"
-                                         ItemText="t => t.Name"
-                                         ItemValue="t => t.Name"
-                                         HideSelected
-                                         >
-                                </MSelect>
-                            </MHover>
+                              Md="6"
+                              Style="margin-top:4%;">
+                            <MTextField Label="离职日期*"
+                                        TValue="DateOnly"
+                                        Dense
+                                        HideDetails="@("auto")"
+                                        @bind-Value="_resignDate"
+                                        Readonly
+                                        AppendIcon="mdi-calendar-range"
+                                        OnMouseUp="() => _resignDateC=true"
+                                        OnAppendClick="() => _resignDateC=true">
+                            </MTextField>
                         </MCol>
+
                         <MCol Cols="12"
-                              Sm="6"
-                              Md="6">
-                        <MHover>
-                            <MSelect Label="职工号列表"
-                                     TItem="MTeacher"
-                                     TValue="int"
-                                     TItemValue="int"
-                                     Items="_selected.ToList()"
-                                     ItemText="t => t.TeacherId.ToString()"
-                                     ItemValue="t => t.TeacherId"
-                                     HideSelected>
-                            </MSelect>
-                        </MHover>
+                              Sm="12"
+                              Md="12"
+                              Style="mb-0;pb-0">
+                            <MTextarea TValue="string"
+                                       TItemValue="string"
+                                       @bind-Value="_groupResignReason"
+                                       Filled
+                                       Required
+                                       Outlined
+                                       BackgroundColor="rgba(0,0,0,0)"
+                                       RequiredMessage="请输入教师离职原因"
+                                       HideDetails="@("auto")"
+                                       Label="离职原因*">
+                            </MTextarea>
                         </MCol>
                     </MRow>
                 </MContainer>
-                <MForm Model="_selected" @bind-Value="_groupResignValid" OnValidSubmit="GroupResignTeacherSubmit">
-            <MContainer Style="margin-top:4%; border:solid 1px #82B1FF; position:relative;">
-                <div style=" color: black; text-align: center; top:-13px;width: 110px; left: 3%; position: absolute; background: white;">离职信息</div>
-                <MRow>
+                <MRow Style="margin-top:1%;">
+                    <MCol Cols="12"
+                          Sm="12"
+                          Md="12"
+                          Style="mt-0;pt-0">
+                        <MTextarea TValue="string"
+                                   TItemValue="string"
+                                   Style="mt-1"
+                                   @bind-Value="_groupDescription"
+                                   Filled
+                                   HideDetails="@("auto")"
+                                   AutoGrow
+                                   BackgroundColor="rgb(0,0,0,0)"
+                                   Outlined
+                                   Label="备注【注意：会添加到选中所有教师的备注！！】">
+                        </MTextarea>
+                    </MCol>
+                </MRow>
+                <MCardActions>
+                    <div style="position:absolute;bottom:6%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                    <MSpacer></MSpacer>
+                    <MButton Color="black"
+                             Text
+                             Outlined
+                             Disabled="!_groupResignValid"
+                             Type="submit">
+                        确认
+                    </MButton>
+                    <MButton Color="black"
+                             Outlined
+                             Text
+                             OnClick="() => _groupResignC = false">
+                        取消
+                    </MButton>
+                    <MSpacer></MSpacer>
+                </MCardActions>
+            </MForm>
+        </MCardText>
+        <MDialog @bind-Value="_resignCompleteVisiable"
+                 MaxWidth="400">
+            <ChildContent>
+                <MCard>
+                    <MCardTitle>
+                        办理成功
+                    </MCardTitle>
+                    <MCardActions>
+                        <MSpacer></MSpacer>
+                        <MButton Color="black"
+                                 Text
+                                 OnClick="() => { UpdateTeacherInfoInCache(); _resignCompleteVisiable = false; _groupResignC = false; }">
+                            确认
+                        </MButton>
+                    </MCardActions>
+                </MCard>
+            </ChildContent>
+        </MDialog>
+
+
+    </MCard>
+</MDialog>
+
+<!--归档用选框-->    
+<MDialog @bind-Value="_DeleteC" MaxWidth="500">
+    <MCard>
+        <MCardTitle Class="text-h5">你确定要归档该条教师信息：@mTeacher.Name ?</MCardTitle>
+        <MCardText>
+            <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                <MRow Style="margin-top:3;">
                     <MCol Cols="12"
                           Sm="6"
                           Md="6"
                           Style="margin-top:4%;">
-                        <MTextField Label="离职日期"
-                                    TValue="DateOnly"
-                                    ValidateOnBlur
+                        <MTextField Label="教职工号"
+                                    TValue="string"
                                     Dense
+                                    Outlined
                                     HideDetails="@("auto")"
-                                    @bind-Value="_resignDate"
-                                    Readonly
-                                    AppendIcon="mdi-calendar-range"
-                                    OnMouseUp="() => _resignDateC=true"
-                                    OnAppendClick="() => _resignDateC=true">
+                                    @bind-Value="mTeacher.EmployeeID"
+                                    Readonly>
                         </MTextField>
                     </MCol>
-
                     <MCol Cols="12"
-                          Sm="12"
-                          Md="12"
-                          Style="mb-0;pb-0">
-                        <MTextarea TValue="string"
-                                   TItemValue="string"
-                                   @bind-Value="_groupResignReason"
-                                   Filled
-                                   Required
-                                   RequiredMessage="请输入教师离职原因"
-                                   HideDetails="@("auto")"
-                                   Label="离职原因">
-                        </MTextarea>
+                          Sm="6"
+                          Md="6"
+                          Style="margin-top:4%;">
+                        <MTextField Label="姓名"
+                                    TValue="string"
+                                    Dense
+                                    HideDetails="@("auto")"
+                                    @bind-Value="mTeacher.Name"
+                                    Outlined
+                                    Readonly>
+                        </MTextField>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="6">
+                        <MSpacer></MSpacer>
+                        @if (_enrollmentDate == DateOnly.MinValue)
+                        {
+                            <MTextField Label="入职日期"
+                                        TValue="string"
+                                        Value="@("yyyy-mm-dd")"
+                                        Dense
+                                        HideDetails="@("auto")"
+                                        Readonly
+                                        AppendIcon="mdi-calendar-range">
+                            </MTextField>
+                        }
+                        else
+                        {
+                            <MTextField Label="入职日期"
+                                        TValue="DateOnly"
+                                        Dense
+                                        HideDetails="@("auto")"
+                                        @bind-Value="_enrollmentDate"
+                                        Readonly
+                                        AppendIcon="mdi-calendar-range">
+                            </MTextField>
+                        }
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="6">
+                        @if (_expiryDate == DateOnly.MinValue)
+                        {
+                            <MTextField Label="合同到期日期"
+                                        TValue="string"
+                                        Value="@("yyyy-mm-dd")"
+                                        Dense
+                                        HideDetails="@("auto")"
+                                        Readonly
+                                        AppendIcon="mdi-calendar-range">
+                            </MTextField>
+                        }
+                        else
+                        {
+                            <MTextField Label="合同到期日期"
+                                        TValue="DateOnly"
+                                        Dense
+                                        HideDetails="@("auto")"
+                                        @bind-Value="_expiryDate"
+                                        Readonly
+                                        AppendIcon="mdi-calendar-range">
+                            </MTextField>
+                        }
                     </MCol>
                 </MRow>
             </MContainer>
-            <MRow Style="margin-top:1%;">
-                <MCol Cols="12"
-                      Sm="12"
-                      Md="12"
-                      Style="mt-0;pt-0">
-                    <MTextarea TValue="string"
-                               TItemValue="string"
-                               Style="mt-1"
-                                   @bind-Value="_groupDescription"
-                               Filled
-                               HideDetails="@("auto")"
-                                   AutoGrow
-                                   BackgroundColor="rgb(0,0,0,0)"
-                                   Outlined
-                                   Label="备注【选填-注意：会添加到选中所有教师的备注！！】">
-                    </MTextarea>
-                </MCol>
-            </MRow>
-            </MForm>
-            </MCardText>
-            <MDialog @bind-Value="_resignCompleteVisiable"
-                     MaxWidth="600"
-                     Persistent>
-                <ChildContent>
-                    <MCard>
-                        <MCardTitle>
-                            办理成功
-                        </MCardTitle>
-                        <MCardActions>
-                            <MSpacer></MSpacer>
-                            <MButton Color="black"
-                                     Text
-                                     OnClick="() => { UpdateTeacherInfoInCache(); _resignCompleteVisiable = false; _groupResignC = false; }">
-                                确认
-                            </MButton>
-                        </MCardActions>
-                    </MCard>
-                </ChildContent>
-            </MDialog>
-            <MCardActions>
-                <MSpacer></MSpacer>
-                <MButton Color="black"
-                         Text
-                         Outlined
-                         Disabled="!_groupResignValid"
-                         Type="submit">
-                    确认
-                </MButton>
-                <MButton Color="black"
-                         Outlined
-                         Text
-                         OnClick="() => _groupResignC = false">
-                    取消
-                </MButton>
-                <MSpacer></MSpacer>
-            </MCardActions>
-        
-    </MCard>
-</MDialog>
-
-<!--归档用选框-->
-<MDialog @bind-Value="_DeleteC" MaxWidth="500">
-    <MCard>
-        <MCardTitle Class="text-h5">你确定要归档该条教师信息：@mTeacher.Name ?</MCardTitle>
-        <MForm Model="mTeacher" @bind-Value="_deleteValid" OnValidSubmit="DeleteConfirm" >
-            <MCardText>
+            <MForm Model="mTeacher" @bind-Value="_deleteValid" OnValidSubmit="DeleteConfirm">
                 <MTextarea TValue="string"
                            TItemValue="string"
                            @bind-Value="mTeacher.DeleteReason"
                            Filled
                            Required
-                           Label="归档原因">
+                           BackgroundColor="rgb(0,0,0,0)"
+                           Outlined
+                           Style="margin-top:2%;"
+                           HideDetails="@("auto")"
+                           Label="归档原因*">
                 </MTextarea>
                 <MTextarea TValue="string"
                            TItemValue="string"
                            @bind-Value="mTeacher.Description"
+                           Style="margin-top:2%;"
                            Filled
                            AutoGrow
                            BackgroundColor="rgb(0,0,0,0)"
                            Outlined
-                           Label="备注【选填】">
+                           Label="备注">
                 </MTextarea>
-            </MCardText>
-            <MCardActions>
-                <MSpacer></MSpacer>
+                <MCardActions>
+                    <div style="position:absolute;bottom:5%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                    <MSpacer></MSpacer>
 
-                <MButton Text
-                         Outlined
-                         Disabled="@(_deleteButtonTime!=0||!_deleteValid)"
-                         Type="submit">
-                    @(_deleteButtonTime == 0 ? "确认" : "确认(" + $" {_deleteButtonTime} 秒)")
-                </MButton>
-                <MButton Color="black"
-                         Outlined
-                         Text
-                         OnClick="() => _DeleteC = false">
-                    取消
-                </MButton>
-                <MSpacer></MSpacer>
-            </MCardActions>
-        </MForm>
-            <MDialog @bind-Value="_deleteCompleteVisiable"
-                     MaxWidth="600"
-                     Persistent>
-                <ChildContent>
-                    <MCard>
-                        <MCardTitle>
-                            归档成功
-                        </MCardTitle>
-                        <MCardActions>
-                            <MSpacer></MSpacer>
-                            <MButton 
-                                     Text
-                                     OnClick="() => { UpdateTeacherInfoInCache(); _deleteCompleteVisiable = false; _DeleteC = false; }">
-                                确认
-                            </MButton>
-                        </MCardActions>
-                    </MCard>
-                </ChildContent>
-            </MDialog>
+                    <MButton Text
+                             Outlined
+                             Disabled="@(_deleteButtonTime!=0||!_deleteValid)"
+                             Type="submit">
+                        @(_deleteButtonTime == 0 ? "确认" : "确认(" + $" {_deleteButtonTime} 秒)")
+                    </MButton>
+                    <MButton Color="black"
+                             Outlined
+                             Text
+                             OnClick="() => _DeleteC = false">
+                        取消
+                    </MButton>
+                    <MSpacer></MSpacer>
+                </MCardActions>
+            </MForm>
+        </MCardText>
+        <MDialog @bind-Value="_deleteCompleteVisiable"
+                 MaxWidth="400">
+            <ChildContent>
+                <MCard>
+                    <MCardTitle>
+                        归档成功
+                    </MCardTitle>
+                    <MCardActions>
+                        <MSpacer></MSpacer>
+                        <MButton Text
+                                 OnClick="() => { UpdateTeacherInfoInCache(); _deleteCompleteVisiable = false; _DeleteC = false; }">
+                            确认
+                        </MButton>
+                    </MCardActions>
+                </MCard>
+            </ChildContent>
+        </MDialog>
     </MCard>
 </MDialog>
 
 <!--批量归档用选框-->
 <MDialog @bind-Value="_DeleteGroupC" MaxWidth="500">
     <MCard>
-        <MCardTitle Class="text-h5">你确定要归档以下教师信息： @string.Join(", ", _selected.Select(t => t.Name)) ?</MCardTitle>
-        <MForm Model="_selected" @bind-Value="_deleteValid" OnValidSubmit="GroupDeleteConfirm">
-            <MCardText>
+        <MCardTitle Class="text-h5">批量归档教师信息</MCardTitle>
+        <MCardText>
+            <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                <MRow Style="margin-top:2%;">
+
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="6">
+                        <MMenu OpenOnHover OffsetY>
+                            <ActivatorContent>
+                                <MButton @attributes="@context.Attrs">名称列表</MButton>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <MList>
+                                    @foreach (var item in _selected.ToList())
+                                    {
+                                        <MListItem>
+                                            <MListItemContent>
+                                                <MListItemTitle>
+                                                    @item.Name
+                                                </MListItemTitle>
+                                            </MListItemContent>
+                                        </MListItem>
+                                    }
+                                </MList>
+                            </ChildContent>
+                        </MMenu>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="6">
+                        <MMenu OpenOnHover OffsetY>
+                            <ActivatorContent>
+                                <MButton @attributes="@context.Attrs">职工号列表</MButton>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <MList>
+                                    @foreach (var item in _selected.ToList())
+                                    {
+                                        <MListItem>
+                                            <MListItemContent>
+                                                <MListItemTitle>
+                                                    @item.TeacherId
+                                                </MListItemTitle>
+                                            </MListItemContent>
+                                        </MListItem>
+                                    }
+                                </MList>
+                            </ChildContent>
+                        </MMenu>
+                    </MCol>
+                </MRow>
+            </MContainer>
+            <MForm Model="_selected" @bind-Value="_deleteValid" OnValidSubmit="GroupDeleteConfirm">
                 <MTextarea TValue="string"
                            TItemValue="string"
                            @bind-Value="_deleteReason"
+                           Style="margin-top:2%;"
                            Filled
                            Required
-                           Label="归档原因">
+                           Outlined
+                           BackgroundColor="rgb(0,0,0,0)"
+                           HideDetails="@("auto")"
+                           Label="归档原因*">
                 </MTextarea>
                 <MTextarea TValue="string"
                            TItemValue="string"
@@ -1448,47 +1584,50 @@
                            Filled
                            AutoGrow
                            BackgroundColor="rgb(0,0,0,0)"
+                           Style="margin-top:2%;"
                            Outlined
-                           Label="备注【选填-注意：会添加到所有选中教师的备注！！】">
+                           Label="备注【注意：会添加到所有选中教师的备注！！】">
                 </MTextarea>
-            </MCardText>
-            <MCardActions>
-                <MSpacer></MSpacer>
 
-                <MButton
-                         Text
-                         Outlined
-                         Disabled="@(_deleteButtonTime!=0||!_deleteValid)"
-                         Type="submit">
-                    @(_deleteButtonTime == 0 ? "确认" : "确认(" + $" {_deleteButtonTime} 秒)")
-                </MButton>
-                <MButton Outlined
-                         Text
-                         OnClick="() => _DeleteGroupC = false">
-                    取消
-                </MButton>
-                <MSpacer></MSpacer>
-            </MCardActions>
-        </MForm>
+
+
+
+                <MCardActions>
+                    <div style="position:absolute;bottom:3%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                    <MSpacer></MSpacer>
+
+                    <MButton Text
+                             Outlined
+                             Disabled="@(_deleteButtonTime!=0||!_deleteValid)"
+                             Type="submit">
+                        @(_deleteButtonTime == 0 ? "确认" : "确认(" + $" {_deleteButtonTime} 秒)")
+                    </MButton>
+                    <MButton Outlined
+                             Text
+                             OnClick="() => _DeleteGroupC = false">
+                        取消
+                    </MButton>
+                    <MSpacer></MSpacer>
+                </MCardActions>
+            </MForm>
+        </MCardText>
         <MDialog @bind-Value="_deleteGroupCompleteVisiable"
-                     MaxWidth="600"
-                     Persistent>
-                <ChildContent>
-                    <MCard>
-                        <MCardTitle>
-                            归档成功
-                        </MCardTitle>
-                        <MCardActions>
-                            <MSpacer></MSpacer>
-                            <MButton 
-                                     Text
+                 MaxWidth="400">
+            <ChildContent>
+                <MCard>
+                    <MCardTitle>
+                        归档成功
+                    </MCardTitle>
+                    <MCardActions>
+                        <MSpacer></MSpacer>
+                        <MButton Text
                                  OnClick="() => { UpdateTeacherInfoInCache(); _deleteGroupCompleteVisiable = false; _DeleteGroupC = false; }">
-                                <MIcon>mdi-check</MIcon>确认
-                            </MButton>
-                        </MCardActions>
-                    </MCard>
-                </ChildContent>
-            </MDialog>
+                            <MIcon>mdi-check</MIcon>确认
+                        </MButton>
+                    </MCardActions>
+                </MCard>
+            </ChildContent>
+        </MDialog>
     </MCard>
 </MDialog>
 
@@ -1606,11 +1745,7 @@
             .SetSlidingExpiration(TimeSpan.FromSeconds(30));
 
         MemoryCache.Set("CachedInfo", teacherInfo, cacheEntryOptions);
-        showTeachers.Clear();
-        foreach (var tec in teacherInfo)
-        {
-            showTeachers.Add(tec);
-        }
+        onSearch();
         StateHasChanged();
         return;
     }
@@ -1626,24 +1761,74 @@
             Align = DataTableHeaderAlign.Center,
             Sortable = true,
             // Value =_headers.FindIndex(header => header.Value == nameof(MTeacher.TeacherId)),
-            Value = nameof(MTeacher.TeacherId),
+            Value = nameof(MTeacher.EmployeeID),
             Ellipsis = new DataTableEllipsis(),
-            Width = 100
+            Width = 140
         },
-        new() { Text = "姓名", Value = nameof(MTeacher.Name),Width=100,Align=DataTableHeaderAlign.Center,Sortable=false },
-        new() { Text = "性别", Value = nameof(MTeacher.Sex),Width=65,Align=DataTableHeaderAlign.Center,Sortable=false},
-        new() { Text = "手机号", Value = nameof(MTeacher.PhoneNumber),Width=200,Align=DataTableHeaderAlign.Center,Sortable=false },
-        new() { Text = "联系邮箱", Value = nameof(MTeacher.Email),Width=250,Align=DataTableHeaderAlign.Center,Sortable=false },
-        new() { Text = "学院", Value = nameof(MTeacher.SchoolName),Align=DataTableHeaderAlign.Center,Width=200 },
-        new() { Text = "职务", Value = nameof(MTeacher.JobPosition),Sortable=false,Align=DataTableHeaderAlign.Center,Class="text-no-wrap" },
-        new() { Text = "职称", Value = nameof(MTeacher.JobTitle),Sortable=false,Align=DataTableHeaderAlign.Center,Class="text-no-wrap" },
-        new() { Text = "状态", Value="States", Sortable=false,Align=DataTableHeaderAlign.Center,Class="text-no-wrap" },
-        new() { Text = "操作", Value = "Actions", Sortable = false, Align=DataTableHeaderAlign.Center, Width = 350 }
+        new() {
+            Text = "姓名",
+            Value = nameof(MTeacher.Name),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=100
+        },
+        new() {
+            Text = "性别",
+            Value = nameof(MTeacher.Sex),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=65
+        },
+        new() { Text = "联系电话",
+            Value = nameof(MTeacher.PhoneNumber),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=200,
+        },
+        new() { Text = "联系邮箱",
+            Value = nameof(MTeacher.Email),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=250
+        },
+        new() { Text = "学院",
+            Value = nameof(MTeacher.SchoolName),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=200,
+        },
+        new() { Text = "职务",
+            Value = nameof(MTeacher.JobPosition),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Class="text-no-wrap"
+        },
+        new() { Text = "职称",
+            Value = nameof(MTeacher.JobTitle),
+            Sortable=false,Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap"
+        },
+        new() {
+            Text = "状态",
+            Value="States",
+            Sortable=false,
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap"
+        },
+        new() {
+            Text = "操作",
+            Value = "Actions",
+            Sortable = false,
+            Align=DataTableHeaderAlign.Center,
+            Width = 150
+        }
     };
 
     private IEnumerable<MTeacher> _selected = new List<MTeacher>();
 
-    private Func<MTeacher,bool> TeacherSelectable()
+    private Func<MTeacher, bool> TeacherSelectable()
     {
         return teacher =>
     {
@@ -1661,8 +1846,8 @@
     {
         mTeacher = teacher;
         _readC = true;
-        _enrollmentDate=DateOnly.FromDateTime(teacher.EnrollmentDate);
-        _expiryDate=DateOnly.FromDateTime(teacher.ExpiryDate);
+        _enrollmentDate = DateOnly.FromDateTime(teacher.EnrollmentDate);
+        _expiryDate = DateOnly.FromDateTime(teacher.ExpiryDate);
     }
 
 
@@ -1713,9 +1898,10 @@
     private bool _DeleteGroupC = false;
     private bool _deleteGroupCompleteVisiable = false;
 
-    // 批量归档打开确认窗口
+    // 批量归档打开表单窗口
     private void GroupDeleteTeacherForm()
     {
+
         if (_selected.Count() == 0)
         {
             _errorMessage = "请至少选择一名教师！";
@@ -1747,12 +1933,16 @@
             foreach (var tc in _selected)
             {
                 tc.DeleteReason = _deleteReason;
-                tc.Description += "\n 批量归档备注：" + _deleteDescription;
+                if (!string.IsNullOrEmpty(_deleteDescription)) tc.Description += "\n 批量归档备注：" + _deleteDescription;
             }
             List<MTeacher> list = _selected.ToList();
             _errorMessage = TeacherService.DeleteTeacher(list);
-            if (!string.IsNullOrEmpty(_errorMessage)) _errorVisiable = true;
-            else _deleteGroupCompleteVisiable = true;
+            if (!string.IsNullOrEmpty(_errorMessage)) { _errorVisiable = true; return; }
+            else
+            {
+                _selected = new List<MTeacher>();
+                _deleteGroupCompleteVisiable = true;
+            }
         }
         return;
     }
@@ -1770,7 +1960,8 @@
     {
 
         mTeacher = CopyUtil<MTeacher, MTeacher>.Trans(teacher);
-        _expiryDate=DateOnly.FromDateTime(mTeacher.ExpiryDate);
+        _expiryDate = DateOnly.FromDateTime(mTeacher.ExpiryDate);
+        mTeacher.DepartedDate = _expiryDate.ToDateTime(TimeOnly.MinValue);
         _resignC = true;
         _errorVisiable = false;
         _enrollmentDate = DateOnly.FromDateTime(mTeacher.EnrollmentDate);
@@ -1795,7 +1986,7 @@
             _errorVisiable = true;
             return;
         }
-        else if(mTeacher.DepartedDate > mTeacher.ExpiryDate)
+        else if (mTeacher.DepartedDate > mTeacher.ExpiryDate)
         {
             _errorMessage = "离职日期晚于合同到期日期！";
             _errorVisiable = true;
@@ -1809,8 +2000,8 @@
     }
 
     // 多选
-    private bool _groupResignC =false;
-    private bool _groupResignValid =false;
+    private bool _groupResignC = false;
+    private bool _groupResignValid = false;
     private bool _groupResign = false;
     private string _groupResignReason = null;
     private string _groupDescription = null;
@@ -1824,6 +2015,8 @@
             _errorVisiable = true;
             return;
         }
+        _selected = _selected.Where(tc => !(tc.EnrollmentDate >= DateTime.Today || tc.EnrollmentDate == DateTime.MinValue)).ToList();
+        mTeacher = new MTeacher();
         _groupResignC = true;
         _groupResignValid = false;
         _errorVisiable = false;
@@ -1837,7 +2030,7 @@
     private void GroupResignTeacherSubmit()
     {
 
-        if ( _resignDate == DateOnly.MinValue)
+        if (_resignDate == DateOnly.MinValue)
         {
 
             _errorMessage = "请选择离职日期！";
@@ -1859,10 +2052,12 @@
                 return;
             }
         }
-        foreach(MTeacher mt in _selected)
+        foreach (MTeacher mt in _selected)
         {
-            if(!string.IsNullOrEmpty(_groupResignReason))mt.DepartedReason += "\n 批量设置离职时备注："+ _groupResignReason;
+            if (!string.IsNullOrEmpty(_groupResignReason)) mt.DepartedReason += _groupResignReason;
+            if (!string.IsNullOrEmpty(_groupDescription)) mt.Description += "\n 批量设置离职时备注：" + _groupDescription;
             mt.DepartedDate = _resignDate.ToDateTime(TimeOnly.MinValue);
+            mt.IsDeparted = true;
         }
         List<MTeacher> li = _selected.ToList();
         _errorMessage = TeacherService.SetGroupResignTeacher(li);
@@ -1890,22 +2085,22 @@
     // 检查表单信息，有误则报错，无误则提交表单
     private void UpdateTeacherInfo()
     {
-        // EnrollmentDate or ExpiryDate is not selected
-        if (mTeacher.EnrollmentDate == DateTime.MinValue)
+        // 入职日期和合同到期日期必须同时输入
+        if (mTeacher.ExpiryDate != DateTime.MinValue && mTeacher.EnrollmentDate == DateTime.MinValue)
         {
 
-            _errorMessage = "请输入就职日期！";
+            _errorMessage = "请输入入职日期！";
             _errorVisiable = true;
             return;
         }
-        if (mTeacher.ExpiryDate == DateTime.MinValue)
+        if (mTeacher.EnrollmentDate != DateTime.MinValue && mTeacher.ExpiryDate == DateTime.MinValue)
         {
             _errorMessage = "请输入合同到期日期！";
             _errorVisiable = true;
             return;
         }
-        // EnrollmentDate is not earlier than ExpiryDate
-        if (mTeacher.EnrollmentDate >= mTeacher.ExpiryDate)
+        // 合同到期日期不能早于入职日期
+        if (mTeacher.EnrollmentDate != DateTime.MinValue && mTeacher.ExpiryDate != DateTime.MinValue && mTeacher.EnrollmentDate >= mTeacher.ExpiryDate)
         {
             _errorMessage = "合同到期日期不能早于入职日期！";
             _errorVisiable = true;
@@ -1932,9 +2127,9 @@
 
         public int SchoolLimit { get; set; }
 
-        public bool Deleted{get;set;}
+        public bool Deleted { get; set; }
 
-        public bool Resigned{ get; set; }
+        public bool Resigned { get; set; }
     }
     SearchModel searchModel = new SearchModel();
 
@@ -1942,7 +2137,7 @@
     private void onSearch()
     {
         showTeachers.Clear();
-        if (string.IsNullOrEmpty(searchModel.SearchInfo) && searchModel.SchoolLimit != 0 && searchModel.Deleted == true && searchModel.Resigned == true)
+        if (string.IsNullOrEmpty(searchModel.SearchInfo) && searchModel.SchoolLimit == 0 && searchModel.Deleted == true && searchModel.Resigned == true)
         {
             showTeachers.AddRange(teacherInfo);
         }
@@ -1952,11 +2147,13 @@
             {
                 // 检查教师信息是否包含搜索关键字或符合学院限制
                 if ((string.IsNullOrEmpty(searchModel.SearchInfo)
-                || tec.TeacherId.ToString().Contains(searchModel.SearchInfo, StringComparison.OrdinalIgnoreCase)
+                || tec.EmployeeID.Contains(searchModel.SearchInfo, StringComparison.OrdinalIgnoreCase)
                 || tec.Name.Contains(searchModel.SearchInfo, StringComparison.OrdinalIgnoreCase)
-                || tec.PhoneNumber.ToString().Contains(searchModel.SearchInfo)
-                || tec.Email.Contains(searchModel.SearchInfo)
+                || (tec.PhoneNumber != null && tec.PhoneNumber.ToString().Contains(searchModel.SearchInfo))
+                || ((!string.IsNullOrEmpty(tec.Email)) && tec.Email.Contains(searchModel.SearchInfo))
                 || ((!string.IsNullOrEmpty(tec.Description)) && tec.Description.Contains(searchModel.SearchInfo))
+                || ((!string.IsNullOrEmpty(tec.JobTitle)) && tec.JobTitle.Contains(searchModel.SearchInfo))
+                || ((!string.IsNullOrEmpty(tec.JobPosition)) && tec.JobPosition.Contains(searchModel.SearchInfo))
                 || tec.SchoolName.Contains(searchModel.SearchInfo))
                     && (searchModel.SchoolLimit == 0 || tec.SchoolId == searchModel.SchoolLimit)
                     && (searchModel.Deleted == true || tec.IsDeleted == false)
@@ -1986,10 +2183,11 @@
     private DateOnly _enrollmentDate = DateOnly.MinValue;
     private DateOnly _expiryDate = DateOnly.MinValue;
 
-    // 添加按钮点击事件，打开新增信息表单
+    // 添加按钮点击事件，打开添加信息表单
     private void AddTeacherInfo()
     {
         mTeacher = new MTeacher();
+        // mTeacher.EmployeeID = TeacherService.GetEmployeeID();
         dialog = true;
         mTeacher.EnrollmentDate = DateTime.MinValue;
         mTeacher.ExpiryDate = DateTime.MinValue;
@@ -2000,22 +2198,22 @@
     // 检查表单信息，有误则报错，无误则提交表单
     private void SubmitTeacherInfo()
     {
-        // EnrollmentDate or ExpiryDate is not selected
-        if (mTeacher.EnrollmentDate == DateTime.MinValue)
+        // 入职日期和合同到期日期必须同时输入
+        if (mTeacher.ExpiryDate != DateTime.MinValue && mTeacher.EnrollmentDate == DateTime.MinValue)
         {
 
-            _errorMessage = "请输入就职日期！";
+            _errorMessage = "请输入入职日期！";
             _errorVisiable = true;
             return;
         }
-        if (mTeacher.ExpiryDate == DateTime.MinValue)
+        if (mTeacher.EnrollmentDate != DateTime.MinValue && mTeacher.ExpiryDate == DateTime.MinValue)
         {
             _errorMessage = "请输入合同到期日期！";
             _errorVisiable = true;
             return;
         }
         // EnrollmentDate is not earlier than ExpiryDate
-        if (mTeacher.EnrollmentDate >= mTeacher.ExpiryDate)
+        if (mTeacher.EnrollmentDate != DateTime.MinValue && mTeacher.ExpiryDate != DateTime.MinValue && mTeacher.EnrollmentDate >= mTeacher.ExpiryDate)
         {
             _errorMessage = "合同到期日期不能早于入职日期！";
             _errorVisiable = true;
@@ -2050,20 +2248,20 @@
     };
 
     // 联系邮箱
-    static string _mailPattern = @"^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$";
+    static string _mailPattern = @"(^$)|(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$){1,255}";
     static Regex _mailRegex = new Regex(_mailPattern);
     private IEnumerable<Func<string, StringBoolean>> _mailRules = new List<Func<string, StringBoolean>>
         {
-            value => (!string.IsNullOrEmpty(value)&& _mailRegex.IsMatch(value)) ? true: "请输入正确的联系邮箱"
+            value => (string.IsNullOrEmpty(value)|| _mailRegex.IsMatch(value)) ? true: "请输入正确的联系邮箱"
 
         };
 
     //联系电话
-    static string _phonePattern = @"^1[3-9]\d{9}$";
+    static string _phonePattern = @"(^$)|(^1[3-9]\d{9}$)";
     static Regex _phoneRegex = new Regex(_phonePattern);
     private IEnumerable<Func<string, StringBoolean>> _phoneRules = new List<Func<string, StringBoolean>>
         {
-            value => (!string.IsNullOrEmpty(value) && _phoneRegex.IsMatch(value)) ? true: "请输入正确的手机号"
+            value => (string.IsNullOrEmpty(value) || _phoneRegex.IsMatch(value)) ? true: "请输入正确的联系电话"
 
         };
 
@@ -2073,7 +2271,6 @@
     private IEnumerable<Func<string, StringBoolean>> _idRules = new List<Func<string, StringBoolean>>
         {
             value => (!string.IsNullOrEmpty(value) && _idRegex.IsMatch(value)) ? true: "请输入正确的身份证号"
-
         };
 
     // 职称
@@ -2085,4 +2282,13 @@
         "是",
         "否"
     };
+
+    // 教职工号
+    static string _empIDPattern = @"^T\d{5,11}$";
+    static Regex _empIDRegex = new Regex(_empIDPattern);
+    private IEnumerable<Func<string, StringBoolean>> _empIDRules = new List<Func<string, StringBoolean>>
+        {
+            value => (!string.IsNullOrEmpty(value) && _empIDRegex.IsMatch(value)) ? true: "请输入正确的教职工号"
+
+        };
 }

@@ -29,6 +29,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles(); // 允许使用静态文件
+app.UseDirectoryBrowser();
 app.UseAntiforgery();
 
 
