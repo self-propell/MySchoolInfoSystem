@@ -22,7 +22,7 @@
                                 Outlined
                                 Dense
                                 HideDetails="@("auto")"
-                                Label="搜索（教职工号/姓名/手机号/邮箱/职务等）">
+                                Label="模糊搜索（教职工号/姓名/手机号/邮箱/职务等）">
                     </MTextField>
                 </MCol>
                 <MCol Cols="12"
@@ -367,38 +367,44 @@
              ShowSelect
              SelectableKey="TeacherSelectable()"
              Class="elevation-3 mt-5"
-             ResizeMode="_resizeMode">
+             ResizeMode="_resizeMode"
+            FooterProps="@(props => {
+                            props.PageText="第 "+(props.Pagination.PageStart+1).ToString()+" 项-第 "+(props.Pagination.PageStop).ToString()+" 项"+"   共"+(props.Pagination.ItemsLength)+"项";
+})">
     <TopContent>
         <MSpacer></MSpacer>
-        <MButton Outlined
+        <MButton 
                  Elevation="3"
                  OnClick="AddTeacherInfo"
-                 Color="black"
+                 Color="accent"
                  Class="ml-3 mt-3">
             <MIcon Left
-                   Class="mr-2">
+                   Class="mr-2"
+                   Color="white">
                 mdi-account-plus
             </MIcon>
             添加
         </MButton>
-        <MButton Outlined
+        <MButton 
                  Elevation="3"
                  OnClick="GroupResignTeacherForm"
-                 Color="black"
+                 Color="accent"
                  Class="ml-3 mt-3">
             <MIcon Left
-                   Class="mr-2">
+                   Class="mr-2"
+                   Color="white">
                 mdi-account-remove
             </MIcon>
             离职
         </MButton>
-        <MButton Outlined
+        <MButton 
                  Elevation="3"
                  OnClick="GroupDeleteTeacherForm"
-                 Color="black"
+                 Color="accent"
                  Class="ml-3 mt-3">
             <MIcon Left
-                   Class="mr-2">
+                   Class="mr-2"
+                   Color="white">
                 mdi-delete
             </MIcon>
             归档
@@ -409,23 +415,80 @@
         {
             @if (context.Item.EnrollmentDate == DateTime.MinValue || context.Item.EnrollmentDate > DateTime.Now)
             {
-                <span>未入职</span>
+                <MChip Class="ma-2" 
+                        Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                                background-color:rgba(250,250,15,0.7);
+                                border-radius: 5px; 
+                                border: 1px solid rgba(0, 0, 0, 0.1);">未入职</MChip>
             }
             else if (context.Item.IsDeleted)
             {
-                <span>已归档</span>
+                <MChip Class="ma-2" Disabled
+                       Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             border-radius: 5px; 
+                             border: 1px solid rgba(0, 0, 0, 0.1);">已归档</MChip>
             }
             else if (context.Item.IsDeparted)
             {
-                <span>已离职</span>
+                <MChip Class="ma-2" 
+                        Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             background-color:rgba(200,200,200,0.25);
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">已离职</MChip>
             }
             else if (context.Item.DepartedDate>DateTime.Today)
             {
-                <span>在职[已办理离职]</span>
+                <MChip Class="ma-2"
+                       Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             background-color:rgba(255,165,0,0.25);
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">即将离职</MChip>
+            }
+            else if (context.Item.ExpiryDate<=DateTime.Today&&context.Item.IsDeparted==false)
+            {
+                <MChip Class="ma-2" 
+                        Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                                background-color:rgba(255,0,0,0.25);
+                                border-radius: 5px; 
+                                border: 1px solid rgba(0, 0, 0, 0.1);">已到期</MChip>
             }
             else
             {
-                <span>在职 </span>
+                <MChip Class="ma-2" 
+                        Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             background-color:rgba(0,255,0,0.25);
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">在职 </MChip>
             }
 
         }
@@ -433,6 +496,7 @@
         {
             <MIcon Style="margin-right:3px;"
                    title="查看"
+                   Color="accent"
                    OnClick="() => ReadTeacherForm(context.Item)"
                    Icon="@("mdi-file")">
             </MIcon>
@@ -440,23 +504,55 @@
             {
                 <MIcon Style="margin-right:3px;"
                        title="编辑"
+                       Color="accent"
                        OnClick="() => EditTeacherForm(context.Item)"
                        Icon="@("mdi-pencil")">
                 </MIcon>
-                @if (context.Item.EnrollmentDate != DateTime.MinValue && context.Item.EnrollmentDate <= DateTime.Today)
+            }
+            else
+            {
+                <MIcon Style="margin-right:3px;"
+                       title="编辑"
+                       Color="accent"
+                       Disabled
+                       Icon="@("mdi-pencil")">
+                </MIcon>
+            }
+            @if (context.Item.IsDeleted==false&&context.Item.IsDeparted==false &&context.Item.EnrollmentDate != DateTime.MinValue && context.Item.EnrollmentDate <= DateTime.Today)
                 {
                     <MIcon OnClick="() => ResignTeacherForm(context.Item)"
                            Style="margin-right:3px;"
+                           Color="accent"
                            title="离职"
                            Icon="@("mdi-account-remove")">
-                    </MIcon>
-                }
-
-                <MIcon title="删除"
-                       OnClick="() => DeleteTeacherForm(context.Item)"
+                </MIcon>
+            }
+            else
+            {
+                <MIcon Disabled
+                       Style="margin-right:3px;"
+                       Color="accent"
+                       title="离职"
+                       Icon="@("mdi-account-remove")">
+                </MIcon>
+            }
+            @if (context.Item.IsDeleted == false)
+            {
+                <MIcon title="归档"
+                        Color="accent"
+                        OnClick="() => DeleteTeacherForm(context.Item)"
+                        Icon="@(" mdi-delete")">
+                </MIcon>
+            }
+            else
+            {
+                <MIcon title="归档"
+                       Color="accent"
+                       Disabled
                        Icon="@(" mdi-delete")">
                 </MIcon>
             }
+
         }
         else
         {
@@ -1346,7 +1442,7 @@
                         <MSpacer></MSpacer>
                         <MButton Color="black"
                                  Text
-                                 OnClick="() => { UpdateTeacherInfoInCache(); _resignCompleteVisiable = false; _groupResignC = false; }">
+                                 OnClick="() => { UpdateTeacherInfoInCache();_selected=new List<MTeacher>();  _resignCompleteVisiable = false; _groupResignC = false; }">
                             确认
                         </MButton>
                     </MCardActions>
@@ -1621,7 +1717,7 @@
                     <MCardActions>
                         <MSpacer></MSpacer>
                         <MButton Text
-                                 OnClick="() => { UpdateTeacherInfoInCache(); _deleteGroupCompleteVisiable = false; _DeleteGroupC = false; }">
+                                 OnClick="() => { UpdateTeacherInfoInCache(); _selected=new List<MTeacher>();_deleteGroupCompleteVisiable = false; _DeleteGroupC = false; }">
                             <MIcon>mdi-check</MIcon>确认
                         </MButton>
                     </MCardActions>
@@ -1772,7 +1868,7 @@
             Class="text-no-wrap",
             Sortable=false,
             Ellipsis = new DataTableEllipsis(),
-            Width=100
+            Width=150
         },
         new() {
             Text = "性别",
@@ -1784,6 +1880,7 @@
         new() { Text = "联系电话",
             Value = nameof(MTeacher.PhoneNumber),
             Align=DataTableHeaderAlign.Center,
+            Ellipsis = new DataTableEllipsis(),
             Sortable=false,
             Width=200,
         },
@@ -1796,18 +1893,21 @@
         new() { Text = "学院",
             Value = nameof(MTeacher.SchoolName),
             Align=DataTableHeaderAlign.Center,
+            Ellipsis = new DataTableEllipsis(),
             Sortable=false,
             Width=200,
         },
         new() { Text = "职务",
             Value = nameof(MTeacher.JobPosition),
             Align=DataTableHeaderAlign.Center,
+            Ellipsis = new DataTableEllipsis(),
             Sortable=false,
             Class="text-no-wrap"
         },
         new() { Text = "职称",
             Value = nameof(MTeacher.JobTitle),
             Sortable=false,Align=DataTableHeaderAlign.Center,
+            Ellipsis = new DataTableEllipsis(),
             Class="text-no-wrap"
         },
         new() {
