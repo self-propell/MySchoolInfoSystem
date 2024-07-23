@@ -9,6 +9,9 @@ using Masa.Blazor;
 
 namespace SchPeoManageWeb.DAO
 {
+    /// <summary>
+    /// 教师DAO
+    /// </summary>
     public class PM_Teacher_DAO : BASE_DAO<MTeacher>
     {
         /// <summary>
@@ -135,6 +138,11 @@ namespace SchPeoManageWeb.DAO
             return mTeachers;
         }
 
+        /// <summary>
+        /// 插入教师信息
+        /// </summary>
+        /// <param name="teacher"></param>
+        /// <returns></returns>
         public bool InsertTeacherInfo(MTeacher teacher)
         {
             SqlConnection connection = null;

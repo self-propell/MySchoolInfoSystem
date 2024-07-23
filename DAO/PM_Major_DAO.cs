@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Connections.Features;
 
 namespace SchPeoManageWeb.DAO
 {
+    /// <summary>
+    /// 专业DAO
+    /// </summary>
     public class PM_Major_DAO:BASE_DAO<MMajor>
     {
         /// <summary>
@@ -19,7 +22,7 @@ namespace SchPeoManageWeb.DAO
             try
             {
                 connection = SqlConnectionFactory.GetSession();
-                string sqlstr = "SELECT * FROM PM_Majors";
+                string sqlstr = "SELECT * FROM PM_Major";
                 SqlCommand command = new SqlCommand(sqlstr, connection);
                 DataTable dt = new DataTable();
                 new SqlDataAdapter(command).Fill(dt);

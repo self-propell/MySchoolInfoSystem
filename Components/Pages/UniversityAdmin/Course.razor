@@ -1,128 +1,961 @@
-﻿ @page "/UniversityAdmin/Course"
- @layout Layout.UniversityAdminLayout
+﻿@page "/UniversityAdmin/Course"
+@layout Layout.UniversityAdminLayout
 @rendermode InteractiveServer
 @using Microsoft.Extensions.Caching.Memory
 @using SchPeoManageWeb.Models
 @using SchPeoManageWeb.Services
 @using System.Text.RegularExpressions
 @using SchPeoManageWeb.Utils
+@using Microsoft.JSInterop
 @inject IMemoryCache MemoryCache
 
-<h1>课程信息管理</h1
- @*
-<MButton Outlined
-         Elevation="3"
-         Color="accent"
-         OnClick="AddCourseInfo">
-    添加课程
-</MButton>
-<MForm Model="searchModel" ValueChanged="onSearch">
-    <MContainer>
-        <MRow>
-            <MCol Cols="12"
-                  Sm="6"
-                  Md="4">
-                <MTextField @bind-Value="searchModel.SearchInfo"
-                            Clearable
-                            Outlined
-                            Label="搜索">
-                </MTextField>
-            </MCol>
-            <MCol Cols="12"
-                  Sm="6"
-                  Md="3">
-                <MSelect Items="_allMajors"
-                         @bind-Value="searchModel.MajorLimit"
-                         Clearable
-                         TItem="MMajor"
-                         TItemValue="int"
-                         TValue="int"
-                         Outlined
-                         Label="专业"
-                         ItemValue="r => r.MajorID"
-                         ItemText="r => r.MajorName">
-                </MSelect>
-            </MCol>
-            <MCol Cols="12"
-                  Sm="6"
-                  Md="3">
-                <MSelect Items="_allSchools"
-                         @bind-Value="searchModel.SchoolLimit"
-                         Clearable
-                         TItem="MSchool"
-                         TItemValue="int"
-                         TValue="int"
-                         Outlined
-                         Label="学院"
-                         ItemValue="r => r.SchoolId"
-                         ItemText="r => r.SchoolName">
-                </MSelect>
-            </MCol>
-        </MRow>
-    </MContainer>
-</MForm>
+<!--信息搜索框-->
+<MCard Class="mt-3">
+    <MForm Model="searchModel" ValueChanged="onSearch">
+        <MContainer>
+            <MRow>
+                <MCol Cols="12"
+                      Sm="6"
+                      Md="4">
+                    <MTextField @bind-Value="searchModel.SearchInfo"
+                                Clearable
+                                Outlined
+                                Dense
+                                HideDetails="@("auto")"
+                                Label="模糊搜索（课程号/课程名/任教教师/课时等）">
+                    </MTextField>
+                </MCol>
+                <MCol Cols="12"
+                      Sm="6"
+                      Md="3">
+                    <MSelect Items="_allNatures"
+                             @bind-Value="searchModel.CourseNature"
+                             Clearable
+                             TItem="MData"
+                             TItemValue="string"
+                             TValue="string"
+                             Dense
+                             HideDetails="@("auto")"
+                             Outlined
+                             Label="课程性质"
+                             ItemValue="r => r.Name"
+                             ItemText="r => r.Name">
+                    </MSelect>
+                </MCol>
+                <MCol Cols="12"
+                      Sm="2"
+                      Md="2"
+                      Style="padding-top:13px;padding-bottom:0px;">
+                    <MButton OnClick="onSearch">
+                        <MIcon>mdi-card-search</MIcon>搜索
+                    </MButton>
+                </MCol>
+            </MRow>
+        </MContainer>
+    </MForm>
+</MCard>
 
-<!--添加课程信息按钮呼出的表单-->
+<!--讲台信息-->
+@if(_selectedCourse==null)
+{
+    <MCard Class="mt-3" >
+    <MCardTitle>课程讲台</MCardTitle>
+</MCard>
+}
+else{
+    <MCard Class="mt-5">
+        <MCardTitle Style="padding-bottom:0;">@_selectedCourse.CourseName 讲台</MCardTitle>
+        <MCardText>
+            <MDataTable 
+                    Headers="_classHeader"
+                    Items="_showTeachingClass"
+                        FooterProps="@(props => {
+                            props.PageText="第 "+(props.Pagination.PageStart+1).ToString()+" 项-第 "+(props.Pagination.PageStop).ToString()+" 项"+"   共"+(props.Pagination.ItemsLength)+"项";
+                            })">
+                    <TopContent>
+                        <MSpacer></MSpacer>
+                            <MButton 
+                                     Elevation="3"
+                                     OnClick="AddClassInfo"
+                                     Color="accent"
+                                     Class="ml-3 mt-3">
+                                <MIcon Left
+                                       Class="mr-2"
+                                       Color="white">
+                                    mdi-account-plus
+                                </MIcon>
+                                添加讲台
+                            </MButton>
+                    </TopContent>
+            </MDataTable>
+        </MCardText>
+    </MCard>
+}
+
+<!--添加讲台信息弹窗-->
+<MRow Justify="JustifyTypes.Center">
+    <MDialog @bind-Value="_addClassC"
+             Persistent
+             MaxWidth="600">
+        <ActivatorContent>
+        </ActivatorContent>
+        <ChildContent>
+            <MCard>
+                <MCardTitle>
+                    <span class="text-h5">添加讲台</span>
+                </MCardTitle>
+                <MForm Model="mTeachingClass" @bind-Value="_addValid" OnValidSubmit="SubmitClassInfo">
+                    <MCardText>
+                        <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                            <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">课程信息</div>
+                            <MRow>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="课程编号"
+                                                @bind-Value="_selectedCourse.CoursePMID"
+                                                TValue="string"
+                                                Readonly
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="课程名"
+                                                Type="string"
+                                                @bind-Value="_selectedCourse.CourseName"
+                                                TValue="string"
+                                                Readonly
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="_selectedCourse.CourseNature"
+                                             Items="_allNatures"
+                                             ItemText="r => r.Name" ItemValue="r => r.Name"
+                                             Label="课程性质"
+                                             Readonly
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="课时"
+                                                @bind-Value="_selectedCourse.ClassHour"
+                                                TValue="int"
+                                                Readonly
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="_selectedCourse.MajorID"
+                                             Items="_allMajors"
+                                             TItem="MMajor"
+                                             TItemValue="int"
+                                             TValue="int"
+                                             ItemText="r => r.MajorName" ItemValue="r => r.MajorID"
+                                             Label="所属专业"
+                                             Readonly
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="_selectedCourse.OpenSemester"
+                                             Items="_semesters"
+                                             TItem="MData"
+                                             TItemValue="string"
+                                             TValue="string"
+                                             ItemText="r => r.Name" ItemValue="r => r.Name"
+                                             Label="开课学期"
+                                             Readonly
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                            </MRow>
+                        </MContainer>
+                        <MContainer Style="margin-top:15px;border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                            <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">讲台信息</div>
+                            <MRow>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="3">
+                                      <MTextField
+                                          Autofocus
+                                          Label="讲台编号"
+                                          @bind-Value=mTeachingClass.ClassPMID
+                                          TValue="string"
+                                          Outlined
+                                          Dense
+                                          HideDetails="@("auto")"
+                                          >
+                                        </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="3">
+                                    <MTextField Autofocus
+                                                Label="限选人数"
+                                                @bind-Value=mTeachingClass.MaxStuNum
+                                                TValue="int"
+                                                Rules="_maxStuNumRules"
+                                                Outlined
+                                                Dense
+                                                HideDetails="@("auto")"
+                                                >
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MAutocomplete
+                                        Label="任教教师*"
+                                        Outlined
+                                        TItem="MTeacher"
+                                        Items="_teacherInfo"
+                                        TValue="string"
+                                        TItemValue="string"
+                                        ItemText="r => r.Name"
+                                        ItemValue="r => r.EmployeeID"
+                                                   HideDetails="@("auto")"
+                                        @bind-Value=mTeachingClass.TeacherID
+                                        Required
+                                        RequiredMessage="请输入任教教师姓名"
+	                                    Dense
+	                                    >
+                                    </MAutocomplete>
+                                </MCol>
+                            </MRow>
+                            </MContainer>
+                        <MRow Style="margin-top:1%;">
+                            <MCol Cols="12"
+                                  Sm="12">
+                                <MTextarea TValue="string"
+                                           TItemValue="string"
+                                           @bind-Value="mCourse.Description"
+                                           Filled
+                                           AutoGrow
+                                           BackgroundColor="rgb(0,0,0,0)"
+                                           Outlined
+                                           Label="备注">
+                                </MTextarea>
+                            </MCol>
+                        </MRow>
+                    </MCardText>
+                    <MCardActions>
+                        <div style="position:absolute;bottom:3%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                        <MSpacer></MSpacer>
+
+                        <MButton Color="black"
+                                 Text
+                                 Outlined
+                                 Type="submit">
+                            保存
+                        </MButton>
+                        <MButton Color="black"
+                                 Outlined
+                                 Text
+                                 OnClick="() => _addClassC = false">
+                            取消
+                        </MButton>
+
+                        <MSpacer></MSpacer>
+                    </MCardActions>
+                </MForm>
+            </MCard>
+        </ChildContent>
+    </MDialog>
+</MRow>
+
+<!--讲台添加成功弹窗-->
+<MDialog @bind-Value="_addClassCompleteVisiable"
+         MaxWidth="300">
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                新增成功
+            </MCardTitle>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Color="black"
+                         Text
+                         OnClick="() => {UpdateCourseInfoInCache();_addClassCompleteVisiable = false;_addClassC=false;}">
+                    确认
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </ChildContent>
+</MDialog>
 
 <!--课程信息表格主体-->
-<MCard>
-   
-    ﻿<MDataTable Headers="_headers"
-                 Items="@showCourses"
-                 ItemsPerPage="10"
-                 Class="elevation-1">
-        <ItemColContent>
-            @if (context.Header.Value == "Actions")
+﻿<MDataTable Headers="_headers"
+             Items="@showCourses"
+             @bind-Value="_selected"
+             TItem="MCourse"
+             ItemKey="r => r.CoursePMID.ToString()"
+             ItemsPerPage="10"
+             ShowSelect
+             SelectableKey="CourseSelectable()"
+             Class="elevation-3 mt-5"
+             OnRowClick="OnCourseRowClick"
+            FooterProps="@(props => {
+                            props.PageText="第 "+(props.Pagination.PageStart+1).ToString()+" 项-第 "+(props.Pagination.PageStop).ToString()+" 项"+"   共"+(props.Pagination.ItemsLength)+"项";
+                            })">
+    <TopContent>
+        <MSpacer></MSpacer>
+        <MButton 
+                 Elevation="3"
+                 OnClick="AddCourseInfo"
+                 Color="accent"
+                 Class="ml-3 mt-3">
+            <MIcon Left
+                   Class="mr-2"
+                   Color="white">
+                mdi-account-plus
+            </MIcon>
+            添加课程
+        </MButton>
+    </TopContent>
+    <ItemColContent>
+        @if (context.Header.Value == "Actions")
+        {
+            <MIcon Style="margin-right:3px;"
+                   title="查看"
+                   Color="accent"
+                   OnClick="() => ReadCourseForm(context.Item)"
+                   Icon="@("mdi-file")">
+            </MIcon>
+            @if (context.Item.IsDeleted == false)
             {
-                <MRow>
-                    <MCol Cols="12" Sm="3" Lg="3">
-                        <MButton Color="green"
-                                 OnClick="() => EditTeacherForm(context.Item)"
-                                 MaxWidth=25
-                                 Depressed>
-                            <MIcon Left
-                                   Class="mr-2">
-                                mdi-pencil
-                            </MIcon>
-                            编辑
-                        </MButton>
-                    </MCol>
-                    <MCol Cols="12" Sm="1" Lg="1"><MSpacer></MSpacer></MCol>
-                    <MCol Cols="12" Sm="3" Lg="3">
-                        <MButton Color="yellow"
-                                 OnClick="() => ResignTeacherForm(context.Item)"
-                                 MaxWidth=25
-                                 Depressed>
-                            <MIcon Left
-                                   Class="mr-2">
-                                mdi-account-remove
-                            </MIcon>
-                            离职
-                        </MButton>
-                    </MCol>
-                    <MCol Cols="12" Sm="1" Lg="1"><MSpacer></MSpacer></MCol>
-                    <MCol Cols="12" Sm="3" Lg="3">
-                        <MButton Color="red"
-                                 OnClick="() => DeleteTeacherForm(context.Item)"
-                                 MaxWidth=25
-                                 Depressed>
-                            <MIcon Left
-                                   Class="mr-2">
-                                mdi-delete
-                            </MIcon>
-                            删除
-                        </MButton>
-                    </MCol>
-                </MRow>
-
+                <MIcon Style="margin-right:3px;"
+                       title="编辑"
+                       Color="accent"
+                       OnClick="() => EditCourseForm(context.Item)"
+                       Icon="@("mdi-pencil")">
+                </MIcon>
             }
             else
             {
-                @context.Value
+                <MIcon Style="margin-right:3px;"
+                       title="编辑"
+                       Color="accent"
+                       Disabled
+                       Icon="@("mdi-pencil")">
+                </MIcon>
             }
-        </ItemColContent>
-    </MDataTable>
-</MCard>
+            @if (context.Item.IsDeleted == false)
+            {
+                <MIcon title="归档"
+                       Color="accent"
+                       OnClick="() => DeleteCourseForm(context.Item)"
+                       Icon="@(" mdi-delete")">
+                </MIcon>
+            }
+            else
+            {
+                <MIcon title="归档"
+                       Color="accent"
+                       Disabled
+                       Icon="@(" mdi-delete")">
+                </MIcon>
+            }
+
+        }
+        else
+        {
+            @context.Value
+        }
+    </ItemColContent>
+</MDataTable>
+
+<!--通用报错弹窗-->
+<MDialog @bind-Value="_errorVisiable"
+         MaxWidth="400"
+         Persistent>
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                温馨提示
+            </MCardTitle>
+            <MCardText>@_errorMessage</MCardText>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Text
+                         OnClick="() => {_errorMessage=null ;_errorVisiable = false;}">
+                    确认
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </ChildContent>
+</MDialog>
+
+<!--添加课程信息弹窗-->
+<MRow Justify="JustifyTypes.Center">
+    <MDialog @bind-Value="_addCourseC"
+             Persistent
+             MaxWidth="600">
+        <ActivatorContent>
+        </ActivatorContent>
+        <ChildContent>
+            <MCard>
+                <MCardTitle>
+                    <span class="text-h5">添加课程</span>
+                </MCardTitle>
+                <MForm Model="mCourse" @bind-Value="_addValid" OnValidSubmit="SubmitCourseInfo">
+                    <MCardText>
+                        <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                            <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                            <MRow>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="编号*"
+                                                @bind-Value="mCourse.CoursePMID"
+                                                TValue="string"
+                                                Autofocus
+                                                Rules="_pmidRules"
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="课程名*"
+                                                Type="string"
+                                                @bind-Value="mCourse.CourseName"
+                                                TValue="string"
+                                                Rules="_courseNameRules"
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="mCourse.CourseNature"
+                                             Items="_allNatures"
+                                             ItemText="r => r.Name" ItemValue="r => r.Name"
+                                             Label="课程性质*"
+                                             Required
+                                             RequiredMessage="请选择课程性质"
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="课时*"
+                                                @bind-Value="mCourse.ClassHour"
+                                                TValue="int"
+                                                RequiredMessage="请输入课时"
+                                                Required
+                                                Rules="_classHourRules"
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="mCourse.MajorID"
+                                             Items="_allMajors"
+                                             TItem="MMajor"
+                                             TItemValue="int"
+                                             TValue="int"
+                                             ItemText="r => r.MajorName" ItemValue="r => r.MajorID"
+                                             Label="所属专业*"
+                                             Required
+                                             RequiredMessage="请选择课程所属专业"
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="mCourse.OpenSemester"
+                                             Items="_semesters"
+                                             TItem="MData"
+                                             TItemValue="string"
+                                             TValue="string"
+                                             ItemText="r => r.Name" ItemValue="r => r.Name"
+                                             Label="开课学期"
+                                             Required
+                                             RequiredMessage="请选择课程开课学期！"
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                            </MRow>
+                        </MContainer>
+                        <MRow Style="margin-top:1%;">
+                            <MCol Cols="12"
+                                  Sm="12">
+                                <MTextarea TValue="string"
+                                           TItemValue="string"
+                                           @bind-Value="mCourse.Description"
+                                           Filled
+                                           AutoGrow
+                                           BackgroundColor="rgb(0,0,0,0)"
+                                           Outlined
+                                           Label="备注">
+                                </MTextarea>
+                            </MCol>
+                        </MRow>
+                    </MCardText>
+                    <MCardActions>
+                        <div style="position:absolute;bottom:3%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                        <MSpacer></MSpacer>
+
+                        <MButton Color="black"
+                                 Text
+                                 Outlined
+                                 Type="submit">
+                            保存
+                        </MButton>
+                        <MButton Color="black"
+                                 Outlined
+                                 Text
+                                 OnClick="() => _addCourseC = false">
+                            取消
+                        </MButton>
+
+                        <MSpacer></MSpacer>
+                    </MCardActions>
+                </MForm>
+            </MCard>
+        </ChildContent>
+    </MDialog>
+</MRow>
+
+<!--课程添加成功弹窗-->
+<MDialog @bind-Value="_addCourseCompleteVisiable"
+         MaxWidth="300">
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                新增成功
+            </MCardTitle>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Color="black"
+                         Text
+                         OnClick="() => {UpdateCourseInfoInCache();_addCourseCompleteVisiable = false;_addCourseC=false;}">
+                    确认
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </ChildContent>
+</MDialog>
+
+<!--查看课程信息弹窗-->
+<MRow Justify="JustifyTypes.Center">
+    <MDialog @bind-Value="_readC"
+             Persistent
+             MaxWidth="600">
+        <ActivatorContent>
+        </ActivatorContent>
+        <ChildContent>
+            <MCard>
+                <MCardTitle>
+                    <span class="text-h5">课程信息</span>
+                </MCardTitle>
+                <MForm Model="mCourse" @bind-Value="_addValid" OnValidSubmit="SubmitCourseInfo">
+                    <MCardText>
+                        <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                            <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                            <MRow>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="编号*"
+                                                @bind-Value="mCourse.CoursePMID"
+                                                TValue="string"
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Readonly
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="课程名*"
+                                                Type="string"
+                                                @bind-Value="mCourse.CourseName"
+                                                TValue="string"
+                                                Readonly
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="mCourse.CourseNature"
+                                             Items="_allNatures"
+                                             ItemText="r => r.Name" ItemValue="r => r.Name"
+                                             Label="课程性质*"
+                                             Readonly
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MTextField Label="课时*"
+                                                @bind-Value="mCourse.ClassHour"
+                                                TValue="int"
+                                                Readonly
+                                                HideDetails="@("auto")"
+                                                Dense
+                                                Outlined>
+                                    </MTextField>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="mCourse.MajorID"
+                                             Items="_allMajors"
+                                             TItem="MMajor"
+                                             TItemValue="int"
+                                             TValue="int"
+                                             ItemText="r => r.MajorName" ItemValue="r => r.MajorID"
+                                             Label="所属专业*"
+                                             Readonly
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                                <MCol Cols="12"
+                                      Sm="6"
+                                      Md="6">
+                                    <MSelect @bind-Value="mCourse.OpenSemester"
+                                             Items="_semesters"
+                                             TItem="MData"
+                                             TItemValue="string"
+                                             TValue="string"
+                                             ItemText="r => r.Name" ItemValue="r => r.Name"
+                                             Label="开设时间"
+                                             Readonly
+                                             HideDetails="@("auto")"
+                                             Dense
+                                             Outlined></MSelect>
+                                </MCol>
+                            </MRow>
+                        </MContainer>
+                        <MRow Style="margin-top:1%;">
+                            <MCol Cols="12"
+                                  Sm="12">
+                                <MTextarea TValue="string"
+                                           TItemValue="string"
+                                           @bind-Value="mCourse.Description"
+                                           Filled
+                                           AutoGrow
+                                           Readonly
+                                           BackgroundColor="rgb(0,0,0,0)"
+                                           Outlined
+                                           Label="备注">
+                                </MTextarea>
+                            </MCol>
+                        </MRow>
+                    </MCardText>
+                    <MCardActions>
+                        <div style="position:absolute;bottom:3%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                        <MSpacer></MSpacer>
+                        <MButton Color="black"
+                                 Outlined
+                                 Text
+                                 OnClick="() => _readC = false">
+                            关闭
+                        </MButton>
+
+                        <MSpacer></MSpacer>
+                    </MCardActions>
+                </MForm>
+            </MCard>
+        </ChildContent>
+    </MDialog>
+</MRow>
+
+<!--编辑用选框-->
+<MDialog @bind-Value="_editC"
+         MaxWidth="900">
+    <MCard>
+        <MCardTitle>
+            <span class="text-h5">编辑课程信息</span>
+        </MCardTitle>
+
+        <MCardText>
+            <MForm Model="mCourse" @bind-Value="_editValid" OnValidSubmit="UpdateCourseInfoSubmit">
+                <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                    <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                    <MRow>
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
+                            <MTextField Label="编号*"
+                                        @bind-Value="mCourse.CoursePMID"
+                                        TValue="string"
+                                        Autofocus
+                                        Rules="_pmidRules"
+                                        HideDetails="@("auto")"
+                                        Dense
+                                        Outlined>
+                            </MTextField>
+                        </MCol>
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
+                            <MTextField Label="课程名*"
+                                        Type="string"
+                                        @bind-Value="mCourse.CourseName"
+                                        TValue="string"
+                                        Rules="_courseNameRules"
+                                        HideDetails="@("auto")"
+                                        Dense
+                                        Outlined>
+                            </MTextField>
+                        </MCol>
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
+                            <MSelect @bind-Value="mCourse.CourseNature"
+                                     Items="_allNatures"
+                                     ItemText="r => r.Name" ItemValue="r => r.Name"
+                                     Label="课程性质*"
+                                     Required
+                                     RequiredMessage="请选择课程性质"
+                                     HideDetails="@("auto")"
+                                     Dense
+                                     Outlined></MSelect>
+                        </MCol>
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
+                            <MTextField Label="课时*"
+                                        @bind-Value="mCourse.ClassHour"
+                                        TValue="int"
+                                        RequiredMessage="请输入课时"
+                                        Required
+                                        Rules="_classHourRules"
+                                        HideDetails="@("auto")"
+                                        Dense
+                                        Outlined>
+                            </MTextField>
+                        </MCol>
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
+                            <MSelect @bind-Value="mCourse.MajorID"
+                                     Items="_allMajors"
+                                     TItem="MMajor"
+                                     TItemValue="int"
+                                     TValue="int"
+                                     ItemText="r => r.MajorName" ItemValue="r => r.MajorID"
+                                     Label="所属专业*"
+                                     Required
+                                     RequiredMessage="请选择课程所属专业"
+                                     HideDetails="@("auto")"
+                                     Dense
+                                     Outlined></MSelect>
+                        </MCol>
+                        <MCol Cols="12"
+                              Sm="6"
+                              Md="6">
+                            <MSelect @bind-Value="mCourse.OpenSemester"
+                                     Items="_semesters"
+                                     TItem="MData"
+                                     TItemValue="string"
+                                     TValue="string"
+                                     ItemText="r => r.Name" ItemValue="r => r.Name"
+                                     Label="开设时间"
+                                     Required
+                                     RequiredMessage="请选择课程开设时间！"
+                                     HideDetails="@("auto")"
+                                     Dense
+                                     Outlined></MSelect>
+                        </MCol>
+                    </MRow>
+                </MContainer>
+                <MRow Style="margin-top:1%;">
+                    <MCol Cols="12"
+                          Sm="12">
+                        <MTextarea TValue="string"
+                                   TItemValue="string"
+                                   @bind-Value="mCourse.Description"
+                                   Filled
+                                   AutoGrow
+                                   BackgroundColor="rgb(0,0,0,0)"
+                                   Outlined
+                                   Label="备注">
+                        </MTextarea>
+                    </MCol>
+                </MRow>
+                <MCardActions>
+                    <div style="position:absolute;bottom:6%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                    <MSpacer></MSpacer>
+
+                    <MButton Color="black"
+                             Text
+                             Outlined
+                             Type="submit">
+                        保存
+                    </MButton>
+                    <MButton Color="black"
+                             Outlined
+                             Text
+                             OnClick="() => _editC = false">
+                        取消
+                    </MButton>
+                    <MSpacer></MSpacer>
+                </MCardActions>
+            </MForm>
+            <MDialog @bind-Value="_editCompleteVisiable"
+                     MaxWidth="400">
+                <ChildContent>
+                    <MCard>
+                        <MCardTitle>
+                            信息修改成功
+                        </MCardTitle>
+                        <MCardActions>
+                            <MSpacer></MSpacer>
+                            <MButton Color="black"
+                                     Text
+                                     OnClick="()=> {UpdateCourseInfoInCache(); _editCompleteVisiable = false; _editC = false; }">
+                                确认
+                            </MButton>
+                        </MCardActions>
+                    </MCard>
+                </ChildContent>
+            </MDialog>
+
+        </MCardText>
+    </MCard>
+</MDialog>
+
+<!--删除用选框-->
+<MDialog @bind-Value="_DeleteC" MaxWidth="500">
+    <MCard>
+        <MCardTitle Class="text-h5">你确定要删除：@mCourse.CourseName ?</MCardTitle>
+        <MCardText>
+            <MContainer Style="border:solid 1px #82B1FF;padding-top:3;round-md;position:relative;">
+                <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
+                <MRow Style="margin-top:3;">
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="6"
+                          Style="margin-top:4%;">
+                        <MTextField Label="课程编号"
+                                    TValue="string"
+                                    Dense
+                                    Outlined
+                                    HideDetails="@("auto")"
+                                    @bind-Value="mCourse.CoursePMID"
+                                    Readonly>
+                        </MTextField>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="6"
+                          Style="margin-top:4%;">
+                        <MTextField Label="课程名"
+                                    TValue="string"
+                                    Dense
+                                    HideDetails="@("auto")"
+                                    @bind-Value="mCourse.CourseName"
+                                    Outlined
+                                    Readonly>
+                        </MTextField>
+                    </MCol>
+                    </MRow>
+            </MContainer>
+            <MForm Model="mCourse" @bind-Value="_deleteValid" OnValidSubmit="DeleteConfirm">
+                <MTextarea TValue="string"
+                           TItemValue="string"
+                           @bind-Value="mCourse.DeleteReason"
+                           Filled
+                           Required
+                           BackgroundColor="rgb(0,0,0,0)"
+                           Outlined
+                           Style="margin-top:2%;"
+                           HideDetails="@("auto")"
+                           Label="删除原因*">
+                </MTextarea>
+                <MTextarea TValue="string"
+                           TItemValue="string"
+                           @bind-Value="mCourse.Description"
+                           Style="margin-top:2%;"
+                           Filled
+                           AutoGrow
+                           BackgroundColor="rgb(0,0,0,0)"
+                           Outlined
+                           Label="备注">
+                </MTextarea>
+                <MCardActions>
+                    <div style="position:absolute;bottom:5%;left:4%;font-weight:bold;color:rgba(192,192,192,55)">注：带*的为必填项</div>
+                    <MSpacer></MSpacer>
+
+                    <MButton Text
+                             Outlined
+                             Disabled="@(_deleteButtonTime!=0||!_deleteValid)"
+                             Type="submit">
+                        @(_deleteButtonTime == 0 ? "确认" : "确认(" + $" {_deleteButtonTime} 秒)")
+                    </MButton>
+                    <MButton Color="black"
+                             Outlined
+                             Text
+                             OnClick="() => _DeleteC = false">
+                        取消
+                    </MButton>
+                    <MSpacer></MSpacer>
+                </MCardActions>
+            </MForm>
+        </MCardText>
+        <MDialog @bind-Value="_deleteCompleteVisiable"
+                 MaxWidth="400">
+            <ChildContent>
+                <MCard>
+                    <MCardTitle>
+                        删除成功
+                    </MCardTitle>
+                    <MCardActions>
+                        <MSpacer></MSpacer>
+                        <MButton Text
+                                 OnClick="() => { UpdateCourseInfoInCache(); _deleteCompleteVisiable = false; _DeleteC = false; }">
+                            确认
+                        </MButton>
+                    </MCardActions>
+                </MCard>
+            </ChildContent>
+        </MDialog>
+    </MCard>
+</MDialog>
+
+<!--批量删除用选框-->
 
 
 @code {
@@ -130,61 +963,53 @@
     string no = "否";
 
     /*------------------------启动-------------------------------*/
+    // 通用通知栏
+    private bool _addCourseCompleteVisiable = false;
+    private string? _errorMessage = null;
+    private bool _errorVisiable = false;
+
     // 缓存读数据
-    private List<MSchool> _allSchools;
-    private List<MMajor> _allMajors;
-    private List<MCourse> _allCourses;
+    private List<MTeacher> _teacherInfo;
+    private List<MCourse> _courseInfo;
     List<MCourse> showCourses = new List<MCourse>();
-    // 网页缓存教师信息列表【60s刷新一次】
-    private List<MTeacher> LoadTeacherInfoFromCacheAsync()
+    private List<MData> _allNatures = DictService.GetDataByName("课程性质");
+    private List<MMajor> _allMajors = new List<MMajor>();
+    private List<MData> _semesters = new List<MData>();
+    private Dictionary<string, List<MTeachingClass>> _teachingClasses = new Dictionary<string, List<MTeachingClass>>();
+    private List<MTeachingClass> _showTeachingClass = new List<MTeachingClass>();
+    /// <summary>
+    /// 查看/更新缓存中的学期、性质信息
+    /// </summary>
+    private void LoadLongEffectiveInfo()
     {
-        const string cacheItemKey = "CachedTeacherInfo";
-
-        if (!MemoryCache.TryGetValue(cacheItemKey, out List<MTeacher> cachedTeacherInfo) || cachedTeacherInfo.Count == 0)
+        string cacheMajorKey = "CachedMajorInfo";
+        string cacheSemesterKey = "CachedSemestersInfo";
+        if (!MemoryCache.TryGetValue(cacheMajorKey, out List<MMajor> cachedMajors) || _allMajors.Count == 0)
         {
-            cachedTeacherInfo = TeacherService.GetAllActiveTeachers();
+            cachedMajors = MajorService.GetAllActiveMajors();
 
             var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromSeconds(60));
+                .SetSlidingExpiration(TimeSpan.FromMinutes(30));
 
-            MemoryCache.Set(cacheItemKey, cachedTeacherInfo, cacheEntryOptions);
+            MemoryCache.Set(cacheMajorKey, cachedMajors, cacheEntryOptions);
+            _allMajors = cachedMajors;
         }
-
-        return cachedTeacherInfo;
-    }
-    // 网页缓存学院信息列表【5min刷新】
-    private List<MSchool> LoadSchoolInfoFromCacheAsync()
-    {
-        const string schoolCacheKey = "CachedSchoolInfo";
-
-        if (!MemoryCache.TryGetValue(schoolCacheKey, out List<MSchool> cachedSchools) || cachedSchools.Count == 0)
+        if (!MemoryCache.TryGetValue(cacheSemesterKey, out List<MData> cachedSemesters) || _semesters.Count == 0)
         {
-            cachedSchools = SchoolService.GetAllSchools();
+            cachedSemesters = DictService.GetDataByName("开设学年学期");
 
             var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                .SetSlidingExpiration(TimeSpan.FromMinutes(29));
 
-            MemoryCache.Set(schoolCacheKey, cachedSchools, cacheEntryOptions);
+            MemoryCache.Set(cacheSemesterKey, cachedSemesters, cacheEntryOptions);
+            _semesters = cachedSemesters;
         }
-        return cachedSchools;
     }
-    // 网页缓存专业信息列表【10min刷新】
-    private List<MMajor> LoadMajorInfoFromCacheAsync()
-    {
-        const string cacheItemKey = "CachedMajorInfo";
 
-        if (!MemoryCache.TryGetValue(cacheItemKey, out List<MMajor> cachedMajorInfo) || cachedMajorInfo.Count == 0)
-        {
-            cachedMajorInfo = MajorService.GetAllActiveMajors();
-
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromMinutes(10));
-
-            MemoryCache.Set(cacheItemKey, cachedMajorInfo, cacheEntryOptions);
-        }
-        return cachedMajorInfo;
-    }
-    // 网页缓存课程信息列表【30s刷新一次】
+    /// <summary>
+    /// 查看/更新缓存中课程信息
+    /// </summary>
+    /// <returns></returns>
     private List<MCourse> LoadCourseInfoFromCacheAsync()
     {
         const string cacheItemKey = "CachedCourseInfo";
@@ -198,68 +1023,261 @@
 
             MemoryCache.Set(cacheItemKey, cachedCourseInfo, cacheEntryOptions);
         }
+
         return cachedCourseInfo;
     }
-    // 更新缓存、数据库中课程信息列表
+
+    /// <summary>
+    /// 查看/更新缓存中教学班信息
+    /// </summary>
+    /// <returns></returns>
+    private Dictionary<string,List<MTeachingClass>> LoadClassInfoFromCacheAsync()
+    {
+        const string cacheItemKey = "CachedClassInfo";
+
+        if (!MemoryCache.TryGetValue(cacheItemKey, out Dictionary<string, List<MTeachingClass>> cachedClassInfo) || cachedClassInfo.Count == 0)
+        {
+            cachedClassInfo = TeachingClassService.GetAllTeachingClass();
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromSeconds(23));
+
+            MemoryCache.Set(cacheItemKey, cachedClassInfo, cacheEntryOptions);
+        }
+
+        return cachedClassInfo;
+    }
+
+    /// <summary>
+    /// 查看/更新缓存中教师信息
+    /// </summary>
+    /// <returns></returns>
+    private List<MTeacher> LoadTeacherInfoFromCacheAsync()
+    {
+        const string cacheItemKey = "CachedTeacherInfo";
+
+        if (!MemoryCache.TryGetValue(cacheItemKey, out List<MTeacher> cachedTeacherInfo) || cachedTeacherInfo.Count == 0)
+        {
+            cachedTeacherInfo = TeacherService.GetAllActiveTeachers();
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(3));
+
+            MemoryCache.Set(cacheItemKey, cachedTeacherInfo, cacheEntryOptions);
+        }
+
+        return cachedTeacherInfo;
+    }
+
+    /// <summary>
+    /// 启动时调用缓存中信息
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        // 使用缓存中的数据
+        LoadLongEffectiveInfo();
+        _teacherInfo = LoadTeacherInfoFromCacheAsync();
+        _courseInfo = LoadCourseInfoFromCacheAsync();
+        _teachingClasses = LoadClassInfoFromCacheAsync();
+        onSearch();
+    }
+
+    // 更新缓存中的课程信息
     private void UpdateCourseInfoInCache()
     {
-        _allCourses = CourseService.GetAllActiveCourses();
+        _courseInfo = CourseService.GetAllActiveCourses();
 
         // 更新缓存
         var cacheEntryOptions = new MemoryCacheEntryOptions()
             .SetSlidingExpiration(TimeSpan.FromSeconds(30));
 
-        MemoryCache.Set("CachedCourseInfo", _allCourses, cacheEntryOptions);
-        showCourses.Clear();
-        foreach (var tec in _allCourses)
-        {
-            showCourses.Add(tec);
-        }
+        MemoryCache.Set("CachedCourseInfo", _courseInfo, cacheEntryOptions);
+        onSearch();
         StateHasChanged();
         return;
     }
 
-    protected override void OnInitialized()
-    {
-        // 使用缓存中的数据
-        _allSchools = LoadSchoolInfoFromCacheAsync();
-        _allMajors = LoadMajorInfoFromCacheAsync();
-        _allCourses = LoadCourseInfoFromCacheAsync();
-        foreach (var course in _allCourses)
-        {
-            showCourses.Add(course);
-        }
-    }
-
-    // 信息表格
-    private List<DataTableHeader<MMajor>> _headers => new List<DataTableHeader<MMajor>>
+    // 课程信息表格
+    private IEnumerable<MCourse> _selected = new List<MCourse>();
+    /// <summary>
+    /// 课程信息表格主体
+    /// </summary>
+    private List<DataTableHeader<MCourse>> _headers => new List<DataTableHeader<MCourse>>
     {
     new()
         {
-            Text = "序号",
-            Align = DataTableHeaderAlign.Start,
+            Text = "课程号",
+            Align = DataTableHeaderAlign.Center,
             Sortable = true,
-            // Value =_headers.FindIndex(header => header.Value == nameof(mCourse.TeacherId)),
-            Value = nameof(MMajor.MajorID),
+            // Value =_headers.FindIndex(header => header.Value == nameof(MTeacher.TeacherId)),
+            Value = nameof(MCourse.CoursePMID),
             Ellipsis = new DataTableEllipsis(),
-            Width = 100
+            Width = 80
         },
-        new() { Text = "课程名", Value = nameof(MMajor.MajorName),Width=175 },
-        new() { Text = "所属学院", Value = nameof(MMajor.SchoolID),Width=100 },
-        new() { Text = "备注", Value = nameof(MMajor.Description),Ellipsis = new DataTableEllipsis(),Sortable=false,Class="text-no-wrap" },
-        new() { Text = "操作", Value = "Actions", Sortable = false, Width = 250 }
+        new() {
+            Text = "课程名",
+            Value = nameof(MCourse.CourseName),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=150
+        },
+        new() {
+            Text = "开设学期",
+            Value = nameof(MCourse.OpenSemester),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=100
+        },
+        new() { Text = "课时",
+            Value = nameof(MCourse.ClassHour),
+            Align=DataTableHeaderAlign.Center,
+            Ellipsis = new DataTableEllipsis(),
+            Sortable=false,
+            Width=60,
+        },
+        new() { Text = "课程性质",
+            Value = nameof(MCourse.CourseNature),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=100
+        },
+        new() { Text = "所属专业",
+            Value = nameof(MCourse.MajorName),
+            Align=DataTableHeaderAlign.Center,
+            Ellipsis = new DataTableEllipsis(),
+            Sortable=false,
+            Width=90,
+        },
+        new() {
+            Text = "操作",
+            Value = "Actions",
+            Sortable = false,
+            Align=DataTableHeaderAlign.Center,
+            Width = 90
+        }
     };
 
+    // 是否可选择的条件判断
+    private Func<MCourse, bool> CourseSelectable()
+    {
+        return course =>
+    {
+        // 在这里定义教师选择逻辑
+        return !course.IsDeleted;
+    };
+    }
 
-    /*--------------------搜索框------------------------*/
+    /*---------------------------------操作栏------------------------------------*/
+
+    /*----------------读取课程信息----------------*/
+    private bool _readC = false;
+    // 打开读取教师信息表单
+    private void ReadCourseForm(MCourse course)
+    {
+        mCourse = course;
+        _readC = true;
+    }
+
+    /*----------------编辑课程信息----------------*/
+    private bool _editC = false;
+    private bool _editValid = false;
+    private bool _editCompleteVisiable = false;
+
+    /// <summary>
+    /// 初始化编辑菜单
+    /// </summary>
+    /// <param name="course"></param>
+    private void EditCourseForm(MCourse course)
+    {
+        mCourse = CopyUtil<MCourse, MCourse>.Trans(course);
+        _editC = true;
+        _errorVisiable = false;
+        _editCompleteVisiable = false;
+    }
+
+    /// <summary>
+    /// 提交编辑表单
+    /// </summary>
+    private void UpdateCourseInfoSubmit()
+    {
+        _errorMessage = CourseService.UpdateCourseInfo(mCourse);
+        if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            _errorVisiable = true;
+            return;
+        }
+        else
+        {
+            _editCompleteVisiable = true;
+            return;
+        }
+    }
+
+    /*----------------删除课程信息----------------*/
+    private bool _DeleteC = false;
+    private bool _deleteValid = false;
+    private bool _deleteCompleteVisiable = false;
+    private int _deleteButtonTime = 3;
+
+    private Task _disableButtonTask;
+    private CancellationTokenSource _cancellationTokenSource;
+
+    /// <summary>
+    /// 单课程打开删除窗口
+    /// </summary>
+    /// <param name="course"></param>
+    private void DeleteCourseForm(MCourse course)
+    {
+        mCourse = CopyUtil<MCourse, MCourse>.Trans(course);
+        if (_disableButtonTask != null && !_disableButtonTask.IsCompleted)
+        {
+            // 如果当前任务正在执行，取消它并重新启动
+            _cancellationTokenSource.Cancel(); // 取消当前任务
+            _disableButtonTask = null;
+        }
+        if (_disableButtonTask == null)
+        {
+            // 启动新任务
+            _cancellationTokenSource = new CancellationTokenSource();
+            _disableButtonTask = DisableButtonTemporarily(_cancellationTokenSource.Token);
+        }
+        _DeleteC = true;
+        _deleteValid = false;
+    }
+
+    // 删除窗口确认按钮限制
+    private async Task DisableButtonTemporarily(CancellationToken token)
+    {
+        _deleteButtonTime = 3;
+        StateHasChanged(); // 立即更新UI
+        _deleteValid = false;
+        for (; _deleteButtonTime > 0; _deleteButtonTime--)
+        {
+            StateHasChanged(); // 更新UI以显示剩余时间
+            await Task.Delay(1000, token); // 等待1秒
+        }
+        _deleteValid = true;
+        StateHasChanged(); // 更新UI以启用按钮
+        _disableButtonTask = null;
+    }
+
+    // 单个课程确认删除
+    private void DeleteConfirm()
+    {
+        List<MCourse> list = new List<MCourse> { mCourse };
+        _errorMessage = CourseService.DeleteCourse(list);
+        if (!string.IsNullOrEmpty(_errorMessage)) _errorVisiable = true;
+        else _deleteCompleteVisiable = true;
+    }
+
+    /*---------------------------------搜索框------------------------------------*/
     class SearchModel
     {
         public string? SearchInfo { get; set; }
 
-        public int SchoolLimit { get; set; }
-
-        public int MajorLimit{ get; set; }
-
+        public string CourseNature { get; set; }
     }
     SearchModel searchModel = new SearchModel();
 
@@ -267,81 +1285,216 @@
     private void onSearch()
     {
         showCourses.Clear();
-        if (!string.IsNullOrEmpty(searchModel.SearchInfo) || searchModel.SchoolLimit != 0)
+        if (string.IsNullOrEmpty(searchModel.SearchInfo) && string.IsNullOrEmpty(searchModel.CourseNature))
         {
-
-            foreach (var course in _allCourses)
+            showCourses.AddRange(_courseInfo);
+        }
+        else
+        {
+            foreach (var tec in _courseInfo)
             {
-                // 检查教师信息是否包含搜索关键字或符合学院限制
-                if ((string.IsNullOrEmpty(searchModel.SearchInfo) || course.CourseName.Contains(searchModel.SearchInfo, StringComparison.OrdinalIgnoreCase) || ((!string.IsNullOrEmpty(course.Description)) && course.Description.Contains(searchModel.SearchInfo, StringComparison.OrdinalIgnoreCase)))
-                    && (searchModel.SchoolLimit == 0 || course.MajorID == searchModel.MajorLimit)
-                && (searchModel.MajorLimit == 0 || course.SchoolID == searchModel.SchoolLimit))
+                // 检查课程信息是否包含搜索关键字或符合限制
+                if ((string.IsNullOrEmpty(searchModel.SearchInfo)
+                    ||tec.CourseName.Contains(searchModel.SearchInfo)
+                    ||tec.CoursePMID.ToString().Contains(searchModel.SearchInfo)
+                )
+                && (string.IsNullOrEmpty(searchModel.CourseNature) || tec.CourseNature.Equals(searchModel.CourseNature))
+                )
                 {
-                    showCourses.Add(course);
+                    showCourses.Add(tec);
                 }
             }
         }
-        else showCourses.AddRange(_allCourses);
+        StateHasChanged();
     }
 
+    /*------------------------------添加课程信息---------------------------------*/
+    // 表单控制变量
+    private bool _addCourseC = false;
+    private bool _addValid = false;
 
-    /*-----------表单输入限制-----------*/
-
-    // 姓名
-    private IEnumerable<Func<string, StringBoolean>> _nameRules = new List<Func<string, StringBoolean>>
-        {
-            value => (!string.IsNullOrEmpty(value)) ? true: "请输入姓名"
-
-        };
-
-    // 性别选单性别列表
-    private List<string> _genders = new List<string>
+    // 临时对象，存储添加的信息
+    private MCourse mCourse = new MCourse();
+    // 打开添加课程信息表单时调用的函数
+    private void AddCourseInfo()
     {
-        "男",
-        "女"
+        mCourse = new MCourse();
+        _addCourseC = true;
+        _addValid = false;
+    }
+
+    /// <summary>
+    /// 检查并提交添加课程信息
+    /// </summary>
+    private void SubmitCourseInfo()
+    {
+        _errorMessage = CourseService.AddCourse(mCourse);
+        if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            _errorVisiable = true;
+            return;
+        }
+        else
+        {
+            _addCourseCompleteVisiable=true;
+
+            return;
+        }
+
+    }
+
+    /*------------------------------查看讲台信息---------------------------------*/
+    private MCourse _selectedCourse = null;
+    private List<DataTableHeader<MTeachingClass>> _classHeader => new List<DataTableHeader<MTeachingClass>>
+    {
+    new()
+        {
+            Text = "课程号",
+            Align = DataTableHeaderAlign.Center,
+            Sortable = true,
+            Value = nameof(MTeachingClass.CourseID),
+            Ellipsis = new DataTableEllipsis(),
+            Width = 80
+        },
+        new() {
+            Text = "课程名",
+            Value = nameof(MTeachingClass.CourseName),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=150
+        },
+        new() {
+            Text = "班级编号",
+            Value = nameof(MTeachingClass.ClassPMID),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=100
+        },
+        new() { Text = "主讲教师",
+            Value = nameof(MTeachingClass.TeacherName),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=150
+        },
+        new() {
+            Text = "限选人数",
+            Value = nameof(MTeachingClass.MaxStuNum),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=150
+        },
+        new() {
+            Text = "选课人数",
+            Value = nameof(MTeachingClass.CurStuNum),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=150
+        },
+                new() {
+            Text = "上课地点",
+            Value = nameof(MTeachingClass.Location),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=150
+        },
+        new() {
+            Text = "操作",
+            Value = "Actions",
+            Sortable = false,
+            Align=DataTableHeaderAlign.Center,
+            Width = 90
+        }
     };
 
-    // 联系邮箱
-    static string _mailPattern = @"^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$";
-    static Regex _mailRegex = new Regex(_mailPattern);
-    private IEnumerable<Func<string, StringBoolean>> _mailRules = new List<Func<string, StringBoolean>>
-        {
-            value => (!string.IsNullOrEmpty(value)&& _mailRegex.IsMatch(value)) ? true: "请输入正确的联系邮箱"
-
-        };
-
-    //联系电话
-    static string _phonePattern = @"^1[3-9]\d{9}$";
-    static Regex _phoneRegex = new Regex(_phonePattern);
-    private IEnumerable<Func<string, StringBoolean>> _phoneRules = new List<Func<string, StringBoolean>>
-        {
-            value => (!string.IsNullOrEmpty(value) && _phoneRegex.IsMatch(value)) ? true: "请输入正确的手机号"
-
-        };
-
-    // 身份证
-    static string _idPattern = @"^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$";
-    static Regex _idRegex = new Regex(_idPattern);
-    private IEnumerable<Func<string, StringBoolean>> _idRules = new List<Func<string, StringBoolean>>
-        {
-            value => (!string.IsNullOrEmpty(value) && _idRegex.IsMatch(value)) ? true: "请输入正确的身份证号"
-
-        };
-
-    // 职称
-    private List<MData> _jobTitleItems = DictService.GetJobTitles();
-    // public EventCallback<int> JobTitleFilter(MData _jobTitleItem, string queryText)
-    // {
-    //     var textOne = _jobTitleItem.Name.Trim().ToLowerInvariant();
-    //     var searchText = queryText.Trim().ToLowerInvariant();
-
-    //     return textOne.IndexOf(searchText);
-    // }
-    // 编制
-    private List<string> _budget = new List<string>
+    /// <summary>
+    /// 点击选取课程事件
+    /// </summary>
+    /// <param name="args"></param>
+    private void OnCourseRowClick(DataTableRowMouseEventArgs<MCourse> cour)
     {
-        "是",
-        "否"
+        _selectedCourse = cour.Item;
+        _showTeachingClass = new List<MTeachingClass>();
+        foreach(var item in _teachingClasses)
+        {
+            if(item.Key.Equals(_selectedCourse.CoursePMID))
+            {
+                _showTeachingClass=item.Value;
+            }
+        }
+    }
+
+    private bool _addClassC = false;
+    private bool _addClassCompleteVisiable = false;
+    private MTeachingClass mTeachingClass = new MTeachingClass();
+
+    /// <summary>
+    /// 添加讲台信息打开表单
+    /// </summary>
+    private void AddClassInfo()
+    {
+        _addValid=false;
+        _addClassC = true;
+        mTeachingClass = new MTeachingClass();
+        mTeachingClass.CourseID = _selectedCourse.CoursePMID;
+    }
+
+    /// <summary>
+    ///提交添加讲台信息
+    /// </summary>
+    private void SubmitClassInfo()
+    {
+        _errorMessage = TeachingClassService.AddTeachingClass(mTeachingClass);
+        if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            _errorVisiable = true;
+            return;
+        }
+        else
+        {
+            _addClassCompleteVisiable = true;
+            return;
+        }
+
+    }
+    /*-------------------输入规则列表-------------------*/
+
+    // 课程编号
+    private static string _pmidPattern = @"^C\d{5,11}$";
+    private static Regex _pmidRegex = new Regex(_pmidPattern);
+    private IEnumerable<Func<string, StringBoolean>> _pmidRules = new List<Func<string, StringBoolean>>
+        {
+            value => (!string.IsNullOrEmpty(value) && _pmidRegex.IsMatch(value)) ? true: "请输入正确格式课程编号"
+
+        };
+
+    // 课程名
+    private static string _courseNamePattern = @"^[\u4e00-\u9fa5A-Za-z0-9\s_\-]+$";
+    private static Regex _courseNameRegex = new Regex(_courseNamePattern);
+    private IEnumerable<Func<string, StringBoolean>> _courseNameRules = new List<Func<string, StringBoolean>>
+    {
+        value => (!string.IsNullOrEmpty(value) && _courseNameRegex.IsMatch(value)) ? true: "请输入正确格式课程名"
     };
+
+    // 课时
+    private IEnumerable<Func<int, StringBoolean>> _classHourRules = new List<Func<int, StringBoolean>>
+    {
+        value => value >= 1 && value <= 96 ? true : "课时超出限制范围【1-96】"
+    };
+
+    // 选课人数
+    private IEnumerable<Func<int, StringBoolean>> _maxStuNumRules = new List<Func<int, StringBoolean>>
+    {
+        value => value >= 1 && value <= 3000 ? true : "超出限制范围【1-3000】"
+    };
+
 }
- *@

@@ -11,14 +11,14 @@ namespace SchPeoManageWeb.Models
         public int MajorID {  get; set; }
 
         ///
-        [Column("name")]
+        [Column("major_name")]
         public string MajorName { get; set; }
 
         /// <summary>
         /// 所属学院ID
         /// </summary>
         [Column("school_id")]
-        public string SchoolID { get; set; }
+        public int SchoolID { get; set; }
 
     }
 }

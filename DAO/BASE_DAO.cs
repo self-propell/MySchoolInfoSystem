@@ -1,12 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Reflection;
 
 namespace SchPeoManageWeb.DAO
 {
+    /// <summary>
+    /// 基础数据库转换操作
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class BASE_DAO<T> where T:new()
     {
+        /// <summary>
+        /// 将数据转换为单个对象
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static T ConvertToModel(DataTable dt)
         {
             //实例化泛型对象
@@ -45,6 +56,11 @@ namespace SchPeoManageWeb.DAO
             }
             return t;
         }
+        /// <summary>
+        /// 将数据转换为List
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static List<T> ConvertToList(DataTable dt)
         {
             List<T> ts = new List<T>();
@@ -97,6 +113,96 @@ namespace SchPeoManageWeb.DAO
                 return ts;
             }
             return ts;
+        }
+        /// <summary>
+        /// 自动创建插入语句
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static string GenerateInsertQuery(T entity, out List<SqlParameter> parameters,string dbName)
+        {
+            var type = entity.GetType();
+            var properties = type.GetProperties();
+            var columns = new List<string>();
+            var values = new List<string>();
+            parameters = new List<SqlParameter>();
+
+            foreach (var property in properties)
+            {
+                // 获取属性上的 ColumnAttribute
+                var columnAttr = property.GetCustomAttribute<ColumnAttribute>();
+                // 获取属性上的 DatabaseGeneratedAttribute
+                var dbGeneratedAttr = property.GetCustomAttribute<DatabaseGeneratedAttribute>();
+                // 获取属性上的 IgnoreForInsertAttribute
+                var ignoreAttr = property.GetCustomAttribute<IgnoreForInsertAttribute>();
+
+                // 排除标记为 IgnoreForInsertAttribute 的字段以及自增主键字段
+                if (columnAttr != null && ignoreAttr == null &&
+                    (dbGeneratedAttr == null || dbGeneratedAttr.DatabaseGeneratedOption != DatabaseGeneratedOption.Identity))
+                {
+                    columns.Add(columnAttr.Name);
+                    values.Add($"@{property.Name}");
+                    parameters.Add(new SqlParameter($"@{property.Name}", property.GetValue(entity) ?? DBNull.Value));
+                }
+            }
+
+            string columnsPart = string.Join(", ", columns);
+            string valuesPart = string.Join(", ", values);
+            string sqlstr = $"INSERT INTO {dbName} ({columnsPart}) VALUES ({valuesPart})";
+
+            return sqlstr;
+        }
+
+        /// <summary>
+        /// 自动创建更新语句
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="parameters"></param>
+        /// <param name="dbName"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static string GenerateUpdateQuery(T entity, out List<SqlParameter> parameters, string dbName)
+        {
+            var type = typeof(T);
+            var properties = type.GetProperties();
+            var columns = new List<string>();
+            parameters = new List<SqlParameter>();
+
+            // 获取主键属性
+            var keyProperty = properties.FirstOrDefault(p => p.GetCustomAttribute<KeyAttribute>() != null);
+            if (keyProperty == null)
+                throw new InvalidOperationException("Entity does not have a primary key.");
+
+            // 主键值
+            var keyValue = keyProperty.GetValue(entity);
+
+            // 构建 SQL 更新语句
+            foreach (var property in properties)
+            {
+                var columnAttr = property.GetCustomAttribute<ColumnAttribute>();
+                var dbGeneratedAttr = property.GetCustomAttribute<DatabaseGeneratedAttribute>();
+                var ignoreAttr = property.GetCustomAttribute<IgnoreForInsertAttribute>();
+
+                // 排除主键和标记为忽略的字段
+                if (columnAttr != null && property != keyProperty && ignoreAttr == null &&
+                    (dbGeneratedAttr == null || dbGeneratedAttr.DatabaseGeneratedOption != DatabaseGeneratedOption.Identity))
+                {
+                    columns.Add($"{columnAttr.Name} = @{property.Name}");
+                    parameters.Add(new SqlParameter($"@{property.Name}", property.GetValue(entity) ?? DBNull.Value));
+                }
+            }
+
+            // 添加主键参数
+            parameters.Add(new SqlParameter("@Key", keyValue));
+
+            // 构建 SQL 更新语句
+            string setClause = string.Join(", ", columns);
+            string keyColumn = keyProperty.GetCustomAttribute<ColumnAttribute>()?.Name ?? keyProperty.Name;
+            string sqlstr = $"UPDATE {dbName} SET {setClause} WHERE {keyColumn} = @Key";
+
+            return sqlstr;
         }
     }
 }

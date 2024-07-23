@@ -8,6 +8,9 @@ using System.Text;
 
 namespace SchPeoManageWeb.DAO
 {
+    /// <summary>
+    /// 账号DAO
+    /// </summary>
     public class PM_Account_DAO:BASE_DAO<MAccount>
     {
         /// <summary>

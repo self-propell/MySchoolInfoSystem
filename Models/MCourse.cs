@@ -1,14 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchPeoManageWeb.Models
 {
+    /// <summary>
+    /// 课程实体
+    /// </summary>
     public class MCourse:BasicModel
     {
         /// <summary>
-        /// 专业唯一标识
+        /// 课程数据库唯一标识
         /// </summary>
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("course_id")]
         public int CourseID {  get; set; }
+
+        /// <summary>
+        /// 课程业务用课程号
+        /// </summary>
+        [Column("course_pmid")]
+        public string CoursePMID { get; set; }
 
         /// <summary>
         /// 课程名称
@@ -41,10 +53,11 @@ namespace SchPeoManageWeb.Models
         public int MajorID { get; set; }
 
         /// <summary>
-        /// 所属学院ID【join major表】
+        /// 所属专业名
         /// </summary>
-        [Column("major_id")]
-        public int SchoolID { get; set; }
+        [Column("major_name")]
+        [IgnoreForInsert]
+        public string MajorName { get; set; }
 
     }
 }

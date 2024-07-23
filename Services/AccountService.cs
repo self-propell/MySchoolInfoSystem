@@ -4,6 +4,9 @@ using SchPeoManageWeb.Models;
 
 namespace SchPeoManageWeb.Services
 {
+    /// <summary>
+    /// 账号服务
+    /// </summary>
     public static class AccountService
     {
         private static readonly PM_Account_DAO _accountDAO = new PM_Account_DAO();

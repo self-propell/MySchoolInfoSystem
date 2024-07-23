@@ -2,7 +2,10 @@
 
 namespace SchPeoManageWeb.Models
 {
-    public class MAccount:BasicModel
+    /// <summary>
+    /// 账号实体
+    /// </summary>
+    public class MAccount : BasicModel
     {
         /// <summary>
         /// 用户唯一标识，主键
@@ -28,6 +31,6 @@ namespace SchPeoManageWeb.Models
         /// 账号所属人姓名【连接学生/教师等表进行查询获取】
         /// </summary>
         [Column("name")]
-        public string Name {  get; set; }
+        public string Name { get; set; }
     }
 }

@@ -35,7 +35,7 @@ namespace SchPeoManageWeb.Services
         }
 
         /// <summary>
-        /// 得到未被删除、未办理离职的教师的信息
+        /// 得到未被删除、未离职的教师的信息
         /// </summary>
         /// <returns>教师信息列表MTeacher（List）</returns>
         public static List<MTeacher> GetAllActiveTeachers()

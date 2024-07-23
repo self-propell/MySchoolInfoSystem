@@ -568,7 +568,7 @@
     <ChildContent>
         <MCard>
             <MCardTitle>
-                温馨提示：
+                温馨提示
             </MCardTitle>
             <MCardText>@_errorMessage</MCardText>
             <MCardActions>
@@ -1831,7 +1831,9 @@
         onSearch();
     }
 
-    // 更新缓存中的教师信息
+    /// <summary>
+    /// 更新缓存中的教师信息
+    /// </summary>
     private void UpdateTeacherInfoInCache()
     {
         teacherInfo = TeacherService.GetAllTeachers();
@@ -1846,8 +1848,13 @@
         return;
     }
 
-    // 教师信息表格
+    /// <summary>
+    /// 教师表格边界属性
+    /// </summary>
     private DataTableResizeMode _resizeMode = DataTableResizeMode.Overflow;
+    /// <summary>
+    /// 教师信息表格
+    /// </summary>
     private List<DataTableHeader<MTeacher>> _headers => new List<DataTableHeader<MTeacher>>
     {
 
@@ -1927,7 +1934,10 @@
     };
 
     private IEnumerable<MTeacher> _selected = new List<MTeacher>();
-
+    /// <summary>
+    /// 判断表格教师行是否可选
+    /// </summary>
+    /// <returns></returns>
     private Func<MTeacher, bool> TeacherSelectable()
     {
         return teacher =>
@@ -1957,7 +1967,9 @@
     private bool _deleteCompleteVisiable = false;
     private int _deleteButtonTime = 3;
 
-    // 归档窗口确认按钮限制
+    /// <summary>
+    /// 归档窗口确认按钮限制
+    /// </summary>
     private async void DisableButtonTemporarily()
     {
         _deleteButtonTime = 3;
@@ -1971,7 +1983,10 @@
         StateHasChanged(); // 更新UI以启用按钮
     }
 
-    // 单人归档打开确认窗口
+    /// <summary>
+    /// 单人归档打开确认窗口
+    /// </summary>
+    /// <param name="teacher"></param>
     private void DeleteTeacherForm(MTeacher teacher)
     {
         mTeacher = CopyUtil<MTeacher, MTeacher>.Trans(teacher);
@@ -1998,7 +2013,9 @@
     private bool _DeleteGroupC = false;
     private bool _deleteGroupCompleteVisiable = false;
 
-    // 批量归档打开表单窗口
+    /// <summary>
+    /// 批量归档打开表单窗口
+    /// </summary>
     private void GroupDeleteTeacherForm()
     {
 
@@ -2018,7 +2035,9 @@
 
     }
 
-    // 批量归档确认提交
+    /// <summary>
+    /// 批量归档确认提交
+    /// </summary>
     private void GroupDeleteConfirm()
     {
         if (string.IsNullOrEmpty(_deleteReason))
@@ -2055,7 +2074,10 @@
     private bool _resignDateC = false;
     private DateOnly _resignDate = DateOnly.MinValue;
 
-    // 操作单个教师离职打开表单
+    /// <summary>
+    /// 单个教师离职打开表单
+    /// </summary>
+    /// <param name="teacher"></param>
     private void ResignTeacherForm(MTeacher teacher)
     {
 
@@ -2070,7 +2092,9 @@
         _resignCompleteVisiable = false;
     }
 
-    // 操作单个教师离职提交表单
+    /// <summary>
+    /// 单个教师离职提交表单
+    /// </summary>
     private void ResignTeacherSubmit()
     {
         if (mTeacher.DepartedDate == null || mTeacher.DepartedDate == DateTime.MinValue)
@@ -2106,7 +2130,9 @@
     private string _groupResignReason = null;
     private string _groupDescription = null;
 
-    // 打开批量设置离职表单
+    /// <summary>
+    /// 打开批量设置离职表单
+    /// </summary>
     private void GroupResignTeacherForm()
     {
         if (_selected.Count() == 0)
@@ -2126,7 +2152,9 @@
         _groupResignReason = null;
     }
 
-    // 批量离职提交操作
+    /// <summary>
+    /// 批量离职提交操作
+    /// </summary>
     private void GroupResignTeacherSubmit()
     {
 
@@ -2233,7 +2261,9 @@
     }
     SearchModel searchModel = new SearchModel();
 
-    // 搜索框内内容发生更改时响应事件
+    /// <summary>
+    /// 搜索框内内容发生更改时响应事件
+    /// </summary>
     private void onSearch()
     {
         showTeachers.Clear();
@@ -2295,7 +2325,9 @@
         _expiryDate = DateOnly.MinValue;
     }
 
-    // 检查表单信息，有误则报错，无误则提交表单
+    /// <summary>
+    /// 检查表单信息，有误则报错，无误则提交表单
+    /// </summary>
     private void SubmitTeacherInfo()
     {
         // 入职日期和合同到期日期必须同时输入

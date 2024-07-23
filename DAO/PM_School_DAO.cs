@@ -5,6 +5,9 @@ using System.Data;
 
 namespace SchPeoManageWeb.DAO
 {
+    /// <summary>
+    /// 学院DAO
+    /// </summary>
     public class PM_School_DAO:BASE_DAO<MSchool>
     {
         /// <summary>
