@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Converters;
 using SchPeoManageWeb.DAO;
 using SchPeoManageWeb.Models;
+using SchPeoManageWeb.Utils;
 using System.Net.NetworkInformation;
 using System.Xml.Linq;
 
@@ -65,7 +66,7 @@ namespace SchPeoManageWeb.Services
         /// <returns>报错信息【无报错为null】</returns>
         public static string AddCourse(MCourse mCourse)
         {
-            if (_courseDAO.GetCourseByPMID(mCourse.CoursePMID))
+            if (_courseDAO.GetCourseByPMID(mCourse.CoursePMID)!=null)
             {
                 return "课程号出现冲突";
             }
@@ -115,10 +116,13 @@ namespace SchPeoManageWeb.Services
         public static string UpdateCourseInfo(MCourse mCourse)
         {
             string msg = null;
+            if (_courseDAO.GetCourseByPMID(mCourse.CoursePMID).CourseID != mCourse.CourseID)
+            {
+                return "课程编号出现冲突";
+            }
             try
             {
-                mCourse.UpdateBy = "admin";
-                mCourse.UpdateTimestamp = DateTime.Now;
+                mCourse = AddBasicInfo.AddUpdateBasicInfo(mCourse);
                 _courseDAO.UpdateCourseInfo(mCourse);
             }
             catch (Exception ex)

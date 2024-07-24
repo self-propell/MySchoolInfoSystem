@@ -1773,8 +1773,8 @@
 </MDialog>
 
 @code {
-    string yes = "是";
-    string no = "否";
+    const string yes = "是";
+    const string no = "否";
 
     /*------------------------启动-------------------------------*/
     // 通用通知栏
@@ -1951,7 +1951,10 @@
 
     /*----------------读取教师信息----------------*/
     private bool _readC = false;
-    // 打开读取教师信息表单
+    /// <summary>
+    /// 打开读取教师信息表单
+    /// </summary>
+    /// <param name="teacher"></param>
     private void ReadTeacherForm(MTeacher teacher)
     {
         mTeacher = teacher;

@@ -3,12 +3,13 @@
 <MApp Style="background-color:#fafafa">
         <PPageTabsProvider>
             <MAppBar App Color="white">
-            <PPageTabs @ref="_pageTabs"
-                       BackgroundColor="rgba(0,0,0,0)"
-                       HideSlider
-                       NoDataPath="@s_noDataPath"
-                       TabOptions="@TabOptions">
-            </PPageTabs>
+                <PPageTabs @ref="_pageTabs"
+                           BackgroundColor="rgba(0,0,0,0)"
+                           HideSlider
+                           NoDataPath="@s_noDataPath"
+                           TabOptions="@TabOptions">
+                </PPageTabs>
+
             </MAppBar>
 
             <MMain>
@@ -63,7 +64,7 @@
 
 @code {
 
-    private PPageTabs? _pageTabs;
+    private PPageTabs _pageTabs;
 
     private static readonly string s_noDataPath = "/UniversityAdmin/Index";
 

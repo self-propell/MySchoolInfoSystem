@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using SchPeoManageWeb.Components.Pages.UniversityAdmin;
 using SchPeoManageWeb.Models;
 using SchPeoManageWeb.Utils;
@@ -46,6 +47,12 @@ namespace SchPeoManageWeb.DAO
             }
             return list;
         }
+        
+        /// <summary>
+        /// 添加教学班级
+        /// </summary>
+        /// <param name="teachingClass"></param>
+        /// <returns></returns>
         public int AddTeachingClass(MTeachingClass teachingClass)
         {
             SqlConnection connection = null;
@@ -58,7 +65,6 @@ namespace SchPeoManageWeb.DAO
                 string sqlstr = GenerateInsertQuery(teachingClass, out parameters, "PM_Teaching_Class");
                 command = new SqlCommand(sqlstr, connection);
                 command.Parameters.AddRange(parameters.ToArray());
-                command.ExecuteNonQuery();
                 rows = command.ExecuteNonQuery();
             }
             catch (Exception) { throw; }
@@ -71,6 +77,130 @@ namespace SchPeoManageWeb.DAO
                 }
             }
             return rows;
+        }
+
+        /// <summary>
+        /// 删除教学班级
+        /// </summary>
+        /// <param name="teachingClass"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public int DeleteTeachingClass(List<MTeachingClass> teachingClass)
+        {
+            SqlConnection connection = null;
+            SqlCommand command = null;
+            int rows = 0;
+            SqlTransaction transaction = null;
+            try
+            {
+                connection = SqlConnectionFactory.GetSession();
+                transaction = connection.BeginTransaction();
+                foreach (var item in teachingClass)
+                {
+                    List<SqlParameter> parameters;
+                    string sqlstr = GenerateDeleteQuery(item, out parameters, "PM_Teaching_Class");
+                    command = new SqlCommand(sqlstr, connection,transaction);
+                    command.Parameters.AddRange(parameters.ToArray());
+                    rows += command.ExecuteNonQuery();
+                }
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                if (transaction != null) transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                if (connection != null)
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+            if (rows != teachingClass.Count)
+            {
+                transaction.Rollback();
+                throw new Exception("执行数据库操作时出错，操作已回滚");
+            }
+            return rows;
+        }
+
+        /// <summary>
+        /// 查找传入的PMID是否已经使用过
+        /// </summary>
+        /// <param name="classPMID"></param>
+        /// <returns></returns>
+        public MTeachingClass CheckClassByPMID(string classPMID)
+        {
+            SqlConnection connection = null;
+            SqlCommand command = null;
+            MTeachingClass mTeachingClass = null;
+            int find;
+            try
+            {
+                connection = SqlConnectionFactory.GetSession();
+                string sqlstr = "SELECT TOP 1 * FROM PM_Teaching_Class tc WHERE tc.class_pmid=@pmid";
+                command = new SqlCommand(sqlstr, connection);
+                command.Parameters.AddWithValue("@pmid", classPMID);
+                DataTable dt = new DataTable();
+                new SqlDataAdapter(command).Fill(dt);
+                if(dt.Rows.Count!=0)mTeachingClass = ConvertToModel(dt);
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                if (connection != null)
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+            return mTeachingClass;
+        }
+
+        /// <summary>
+        /// 根据传入的对象更新数据库
+        /// </summary>
+        /// <param name="teachingClass"></param>
+        public void UpdateTeachingClassInfo(MTeachingClass teachingClass)
+        {
+            SqlConnection connection = null;
+            SqlCommand command = null;
+            SqlTransaction transaction = null;
+            try
+            {
+                connection = SqlConnectionFactory.GetSession();
+                transaction = connection.BeginTransaction();
+                List<SqlParameter> parameters;
+                string sqlstr = GenerateUpdateQuery(teachingClass, out parameters, "PM_Teaching_Class");
+                command = new SqlCommand(sqlstr, connection, transaction);
+                command.Parameters.AddRange(parameters.ToArray());
+                command.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                if (transaction != null)
+                {
+                    transaction.Rollback();
+                }
+                    throw;
+            }
+            finally
+            {
+                if(connection != null)
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+            
+            return;
         }
     }
 }

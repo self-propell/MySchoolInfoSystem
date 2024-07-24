@@ -72,21 +72,23 @@ namespace SchPeoManageWeb.DAO
         }
 
         /// <summary>
-        /// 获取数据库中所有未删除的课程信息
+        /// 根据PMID查询课程信息
         /// </summary>
         /// <returns></returns>
-        public bool GetCourseByPMID(string  pmid)
+        public MCourse GetCourseByPMID(string  pmid)
         {
             SqlConnection connection = null;
             SqlCommand command = null;
-            int find = 0;
+            MCourse course = null;
             try
             {
                 connection = SqlConnectionFactory.GetSession();
-                string sqlstr = "SELECT TOP 1 count(*) FROM PM_Course pc WHERE pc.course_pmid=@pmid";
+                string sqlstr = "SELECT TOP 1 * FROM PM_Course pc WHERE pc.course_pmid=@pmid";
                 command = new SqlCommand(sqlstr, connection);
                 command.Parameters.AddWithValue("@pmid",pmid);
-                find = (int)command.ExecuteScalar();
+                DataTable dt = new DataTable();
+                new SqlDataAdapter(command).Fill(dt);
+                if(dt.Rows.Count!=0)course = ConvertToModel(dt);
             }
             catch (Exception) { throw; }
             finally
@@ -97,7 +99,7 @@ namespace SchPeoManageWeb.DAO
                     connection.Dispose();
                 }
             }
-            return (find!=0)?true:false;
+            return course;
         }
 
         /// <summary>
@@ -148,7 +150,7 @@ namespace SchPeoManageWeb.DAO
                 connection = SqlConnectionFactory.GetSession();
                 transaction = connection.BeginTransaction();
                 string sqlstr = "UPDATE PM_Course " +
-                "SET is_deleted=1,delete_by=@deleteBy,delete_timestamp=@deleteTime,delete_reason=@deleteReason,description=@des " +
+                "SET update_by=@updateBy,update_timestamp=@updateTime,is_deleted=1,delete_by=@deleteBy,delete_timestamp=@deleteTime,delete_reason=@deleteReason,description=@des " +
                 "WHERE course_id=@courseID";
 
 
@@ -156,9 +158,10 @@ namespace SchPeoManageWeb.DAO
                 {
                     SqlCommand command = new SqlCommand(sqlstr, connection, transaction);
                     command.Parameters.AddWithValue("@courseID", m.CourseID);
-                    command.Parameters.AddWithValue("@deleteBy", "Admin");
                     command.Parameters.AddWithValue("@des", m.Description ?? (Object)DBNull.Value);
-
+                    command.Parameters.AddWithValue("@updateBy", "Admin");
+                    command.Parameters.AddWithValue("@updateTime", DateTime.Now);
+                    command.Parameters.AddWithValue("@deleteBy", "Admin");
                     command.Parameters.AddWithValue("@deleteTime", DateTime.Now);
                     command.Parameters.AddWithValue("@deleteReason", m.DeleteReason);
                     res += command.ExecuteNonQuery();
@@ -181,7 +184,10 @@ namespace SchPeoManageWeb.DAO
             return res;
         }
 
-        
+        /// <summary>
+        /// 更新课程信息
+        /// </summary>
+        /// <param name="mCourse"></param>
         public void UpdateCourseInfo(MCourse mCourse)
         {
             SqlConnection connection = null;

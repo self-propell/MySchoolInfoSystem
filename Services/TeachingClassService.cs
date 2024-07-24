@@ -1,4 +1,5 @@
-﻿using SchPeoManageWeb.DAO;
+﻿using SchPeoManageWeb.Components.Pages.UniversityAdmin;
+using SchPeoManageWeb.DAO;
 using SchPeoManageWeb.Models;
 using SchPeoManageWeb.Utils;
 
@@ -11,7 +12,7 @@ namespace SchPeoManageWeb.Services
     {
         private static readonly PM_Teaching_Class_DAO _classDAO = new PM_Teaching_Class_DAO();
 
-        
+
         /// <summary>
         /// 获取所有教学班级
         /// </summary>
@@ -23,7 +24,7 @@ namespace SchPeoManageWeb.Services
             try
             {
                 mClass = _classDAO.GetAllTeachingClass();
-                foreach(var m in mClass)
+                foreach (var m in mClass)
                 {
                     if (!classes.ContainsKey(m.CourseID))
                     {
@@ -49,6 +50,10 @@ namespace SchPeoManageWeb.Services
         {
             string msg = null;
             mTeachingClass = AddBasicInfo.AddCreateBasicInfo(mTeachingClass);
+            if (_classDAO.CheckClassByPMID(mTeachingClass.ClassPMID)!=null)
+            {
+                return "讲台编号出现冲突";
+            }
             try
             {
                 int row = _classDAO.AddTeachingClass(mTeachingClass);
@@ -60,6 +65,55 @@ namespace SchPeoManageWeb.Services
                 msg = ex.Message;
             }
             return msg;
+        }
+
+        /// <summary>
+        /// 删除讲台信息【list】
+        /// </summary>
+        /// <param name="classes"></param>
+        /// <returns></returns>
+        public static string DeleteTeachingClass(List<MTeachingClass> classes)
+        {
+            string msg = null;
+            foreach (MTeachingClass m in classes)
+            {
+                AddBasicInfo.AddDeleteBasicInfo(m);
+            }
+            try
+            {
+                _classDAO.DeleteTeachingClass(classes);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                msg = ex.Message;
+            }
+            return msg;
+        }
+
+        /// <summary>
+        /// 更新讲台信息
+        /// </summary>
+        /// <param name="mTeachingClass"></param>
+        /// <returns></returns>
+        public static string UpdateTeachingClassInfo (MTeachingClass mTeachingClass)
+        {
+            string msg = null;
+            mTeachingClass = AddBasicInfo.AddUpdateBasicInfo(mTeachingClass);
+            if (_classDAO.CheckClassByPMID(mTeachingClass.ClassPMID).ClassID!=mTeachingClass.ClassID)
+            {
+                return "讲台编号出现冲突";
+            }
+            try
+            {
+                _classDAO.UpdateTeachingClassInfo(mTeachingClass);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                msg = ex.Message;
+            }
+            return msg; 
         }
     }
 }

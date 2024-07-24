@@ -34,23 +34,33 @@ namespace SchPeoManageWeb.DAO
                 //遍历所有公共属性的名字，查找与DataTable列名相同的属性
                 foreach (PropertyInfo pi in propertys)
                 {
-                    tempName = pi.Name;//获取属性名
-                    if (dt.Columns.Contains(tempName))// 检查DataTable是否包含该属性名    
+                    // 检查属性是否有 Column 特性
+                    var columnAttribute = pi.GetCustomAttribute<ColumnAttribute>();
+                    if (columnAttribute != null)// 检查DataTable是否包含该属性名    
                     {
+                        // 使用 Column 特性中定义的列名
+                        tempName = columnAttribute.Name;
                         //如果该属性是否可写(有setter方法)，则把列的值赋值给该属性
-                        if (pi.CanWrite)
+                        if (dt.Columns.Contains(tempName))
                         {
-                            object value = dr[tempName];
-                            if (value != DBNull.Value)
+                            // 如果该属性是否可写（有 setter 方法），
+                            // 则把列的值赋值给该属性
+                            if (pi.CanWrite)
                             {
-                                // 如果属性是字符串类型，则去除前后空格
-                                if (pi.PropertyType == typeof(string))
+                                object value = dr[tempName];
+                                if (value != DBNull.Value)
                                 {
-                                    value = ((string)value).Trim();
+                                    // 尝试将值转换为属性的类型
+                                    pi.SetValue(t, value, null);
                                 }
-                                pi.SetValue(t, value, null);
+                                else
+                                {
+                                    // 处理 DBNull.Value 的情况，例如设置为 null 或默认值
+                                    pi.SetValue(t, null, null);
+                                }
                             }
                         }
+
                     }
                 }
             }
@@ -204,5 +214,58 @@ namespace SchPeoManageWeb.DAO
 
             return sqlstr;
         }
+        /// <summary>
+        /// 自动创建删除语句
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="parameters"></param>
+        /// <param name="dbName"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static string GenerateDeleteQuery(T entity, out List<SqlParameter> parameters, string dbName)
+        {
+            var type = typeof(T);
+            var properties = type.GetProperties();
+            parameters = new List<SqlParameter>();
+
+            // 获取主键属性
+            var keyProperty = properties.FirstOrDefault(p => p.GetCustomAttribute<KeyAttribute>() != null);
+            if (keyProperty == null)
+                throw new InvalidOperationException("Entity does not have a primary key.");
+
+            // 主键值
+            var keyValue = keyProperty.GetValue(entity);
+
+            // 构建 SQL 更新语句
+            var columns = new List<string>
+            {
+                "is_deleted = @IsDeleted",
+                "update_by = @UpdateBy",
+                "update_timestamp = @UpdateTimestamp",
+                "delete_by = @DeleteBy",
+                "delete_timestamp = @DeleteTimestamp",
+                "description = @Description",
+                "delete_reason = @DeleteReason"
+            };
+
+            parameters.Add(new SqlParameter("@IsDeleted", 1));
+            parameters.Add(new SqlParameter("@UpdateBy", DBNull.Value));  // Placeholder
+            parameters.Add(new SqlParameter("@UpdateTimestamp", DateTime.Now));  // Placeholder
+            parameters.Add(new SqlParameter("@DeleteBy", DBNull.Value));  // Placeholder
+            parameters.Add(new SqlParameter("@DeleteTimestamp", DateTime.Now));  // Placeholder
+            parameters.Add(new SqlParameter("@Description", DBNull.Value));  // Placeholder
+            parameters.Add(new SqlParameter("@DeleteReason", DBNull.Value));  // Placeholder
+
+            // 添加主键参数
+            parameters.Add(new SqlParameter("@Key", keyValue));
+
+            // 构建 SQL 更新语句
+            string setClause = string.Join(", ", columns);
+            string keyColumn = keyProperty.GetCustomAttribute<ColumnAttribute>()?.Name ?? keyProperty.Name;
+            string sqlstr = $"UPDATE {dbName} SET {setClause} WHERE {keyColumn} = @Key";
+
+            return sqlstr;
+        }
+
     }
 }

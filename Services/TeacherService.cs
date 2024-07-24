@@ -1,6 +1,7 @@
 ﻿using Masa.Blazor;
 using SchPeoManageWeb.DAO;
 using SchPeoManageWeb.Models;
+using SchPeoManageWeb.Utils;
 using System.Net.NetworkInformation;
 using System.Xml.Linq;
 
@@ -134,9 +135,7 @@ namespace SchPeoManageWeb.Services
             try
             {
                 // 插入信息
-                mTeacher.UpdateTimestamp = DateTime.Now;
-                mTeacher.ReqTime = DateTime.Now;
-                mTeacher.UpdateBy = "Admin";
+                mTeacher = AddBasicInfo.AddUpdateBasicInfo(mTeacher);
                 // 计算age
                 string year = mTeacher.IdNumber.Substring(6, 4);
                 string month = mTeacher.IdNumber.Substring(10, 2);
@@ -154,9 +153,9 @@ namespace SchPeoManageWeb.Services
                 res = _teacherDAO.UpdateTeacherInfo(mTeacher);
 
             }
-            catch (Exception )
+            catch (Exception ex)
             {
-                return "在写入数据库时发生错误";
+                return ex.Message;
             }
             if (res == true) { return null; }
             else return "发生未知错误";
@@ -219,13 +218,13 @@ namespace SchPeoManageWeb.Services
             return null;
         }
 
-        /// <summary>
-        /// 获取一个可用的教职工号
-        /// </summary>
-        /// <returns></returns>
-        public static int GetEmployeeID()
-        {
-            return 1;
-        }
+        ///// <summary>
+        ///// 获取一个可用的教职工号
+        ///// </summary>
+        ///// <returns></returns>
+        //public static int GetEmployeeID()
+        //{
+        //    return 1;
+        //}
     }
 }
