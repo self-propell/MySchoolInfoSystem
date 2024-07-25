@@ -1982,6 +1982,7 @@
 
         node.Classrooms = floorNodes.Any() ? floorNodes : null;
     }
+
     /// <summary>
     /// 异步获取建筑下属的教室信息
     /// </summary>
@@ -2003,7 +2004,7 @@
         string cacheBuildingKey = "CachedBuildingInfo";
         string cacheClassroomKey = "CachedClassroomInfo";
         // 缓存专业信息
-        if (!MemoryCache.TryGetValue(cacheMajorKey, out List<MMajor> cachedMajors))
+        if (!MemoryCache.TryGetValue(cacheMajorKey, out List<MMajor> cachedMajors)||cachedMajors.Count==0)
         {
             cachedMajors = MajorService.GetAllActiveMajors();
 
@@ -2015,7 +2016,7 @@
         }
         else{ _allMajors = cachedMajors; }
         // 缓存学年学期信息
-        if (!MemoryCache.TryGetValue(cacheSemesterKey, out List<MData> cachedSemesters))
+        if (!MemoryCache.TryGetValue(cacheSemesterKey, out List<MData> cachedSemesters)||cachedSemesters.Count==0)
         {
             cachedSemesters = DictService.GetDataByName("开设学年学期");
 
@@ -2027,7 +2028,7 @@
         }
         else { _semesters = cachedSemesters; }
         // 缓存建筑信息
-        if (!MemoryCache.TryGetValue(cacheBuildingKey, out List<MBuilding> cachedBuildings))
+        if (!MemoryCache.TryGetValue(cacheBuildingKey, out List<MBuilding> cachedBuildings)||cachedBuildings.Count==0)
         {
             cachedBuildings = BuildingService.GetBuildings();
             foreach(var bd in cachedBuildings)
@@ -2043,7 +2044,7 @@
         }
         else { _buildings = cachedBuildings; }
         // 缓存教室信息
-        if (!MemoryCache.TryGetValue(cacheClassroomKey, out List<MClassroom> cachedClassrooms))
+        if (!MemoryCache.TryGetValue(cacheClassroomKey, out List<MClassroom> cachedClassrooms)||cachedClassrooms.Count==0)
         {
             cachedClassrooms = ClassroomService.GetClassrooms();
 
@@ -2073,7 +2074,7 @@
 
             MemoryCache.Set(cacheItemKey, cachedCourseInfo, cacheEntryOptions);
         }
-
+        _courseInfo = cachedCourseInfo;
         return cachedCourseInfo;
     }
 
@@ -2087,14 +2088,14 @@
 
         if (!MemoryCache.TryGetValue(cacheItemKey, out Dictionary<string, List<MTeachingClass>> cachedClassInfo) || cachedClassInfo.Count == 0)
         {
-            cachedClassInfo = TeachingClassService.GetAllTeachingClass();
+            cachedClassInfo = TeachingClassService.GetAllTeachingClassGroupByCourse();
 
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetSlidingExpiration(TimeSpan.FromSeconds(23));
 
             MemoryCache.Set(cacheItemKey, cachedClassInfo, cacheEntryOptions);
         }
-
+        _teachingClasses = cachedClassInfo;
         return cachedClassInfo;
     }
 
@@ -2115,7 +2116,7 @@
 
             MemoryCache.Set(cacheItemKey, cachedTeacherInfo, cacheEntryOptions);
         }
-
+        _teacherInfo = cachedTeacherInfo;
         return cachedTeacherInfo;
     }
 
@@ -2126,9 +2127,9 @@
     {
         // 使用缓存中的数据
         LoadLongEffectiveInfo();
-        _teacherInfo = LoadTeacherInfoFromCacheAsync();
-        _courseInfo = LoadCourseInfoFromCacheAsync();
-        _teachingClasses = LoadClassInfoFromCacheAsync();
+        LoadTeacherInfoFromCacheAsync();
+        LoadCourseInfoFromCacheAsync();
+        LoadClassInfoFromCacheAsync();
         onSearch();
     }
 
@@ -2154,7 +2155,7 @@
     /// </summary>
     private void UpdateClassInfoInCache()
     {
-        _teachingClasses = TeachingClassService.GetAllTeachingClass();
+        _teachingClasses = TeachingClassService.GetAllTeachingClassGroupByCourse();
 
         // 更新缓存
         var cacheEntryOptions = new MemoryCacheEntryOptions()

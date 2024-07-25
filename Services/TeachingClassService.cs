@@ -14,10 +14,10 @@ namespace SchPeoManageWeb.Services
 
 
         /// <summary>
-        /// 获取所有教学班级
+        /// 获取所有教学班级[以课程为KEY分类]
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<string, List<MTeachingClass>> GetAllTeachingClass()
+        public static Dictionary<string, List<MTeachingClass>> GetAllTeachingClassGroupByCourse()
         {
             Dictionary<string, List<MTeachingClass>> classes = new Dictionary<string, List<MTeachingClass>>();
             List<MTeachingClass> mClass = new List<MTeachingClass>();
@@ -31,6 +31,34 @@ namespace SchPeoManageWeb.Services
                         classes[m.CourseID] = new List<MTeachingClass>();
                     }
                     classes[m.CourseID].Add(m);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return classes;
+        }
+
+        /// <summary>
+        /// 获取所有教学班级[以教师为KEY分类]
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, List<MTeachingClass>> GetAllTeachingClassGroupByTeacher()
+        {
+            Dictionary<string, List<MTeachingClass>> classes = new Dictionary<string, List<MTeachingClass>>();
+            List<MTeachingClass> mClass = new List<MTeachingClass>();
+            try
+            {
+                mClass = _classDAO.GetAllTeachingClass();
+                foreach (var m in mClass)
+                {
+                    if (!classes.ContainsKey(m.TeacherID))
+                    {
+                        classes[m.TeacherID] = new List<MTeachingClass>();
+                    }
+                    classes[m.TeacherID].Add(m);
                 }
 
             }

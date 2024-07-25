@@ -9,63 +9,415 @@
 @using Microsoft.JSInterop
 @inject IMemoryCache MemoryCache
 
-<!--信息搜索框-->
-<MCard Class="mt-3">
-    <MForm Model="searchModel" ValueChanged="onSearch">
-        <MContainer>
-            <MRow>
-                <MCol Cols="12"
-                      Sm="6"
-                      Md="4">
-                    <MTextField @bind-Value="searchModel.SearchInfo"
-                                Clearable
-                                Outlined
-                                Dense
-                                HideDetails="@("auto")"
-                                Label="模糊搜索（教职工号/姓名/手机号/邮箱/职务等）">
-                    </MTextField>
-                </MCol>
-                <MCol Cols="12"
-                      Sm="6"
-                      Md="3">
-                    <MSelect Items="_allSchools"
-                             @bind-Value="searchModel.SchoolLimit"
-                             Clearable
-                             TItem="MSchool"
-                             TItemValue="int"
-                             TValue="int"
-                             Dense
-                             HideDetails="@("auto")"
-                             Outlined
-                             Label="学院"
-                             ItemValue="r => r.SchoolId"
-                             ItemText="r => r.SchoolName">
-                    </MSelect>
-                </MCol>
-                <MCol Cols="12"
-                      Sm="2"
-                      Md="1"
-                      Style="padding:18px 12px 5px  5px;">
-                    <MCheckbox @bind-value="searchModel.Resigned" TValue="bool" OnChange="onSearch" Style="margin-top:0%; padding:0%;"><LabelContent>已离职</LabelContent></MCheckbox>
-                </MCol>
-                <MCol Cols="12"
-                      Sm="2"
-                      Md="1"
-                      Style="padding:18px 12px 5px 5px;">
-                    <MCheckbox @bind-value="searchModel.Deleted" TValue="bool" OnChange="onSearch" Style="margin-top:0%; padding:0%;"><LabelContent>已归档</LabelContent></MCheckbox>
-                </MCol>
-                <MCol Cols="12"
-                      Sm="2"
-                      Md="2"
-                      Style="padding-top:13px;padding-bottom:0px;">
-                    <MButton OnClick="onSearch">
-                        <MIcon>mdi-card-search</MIcon>搜索
-                    </MButton>
-                </MCol>
-            </MRow>
-        </MContainer>
-    </MForm>
+<!--导航栏-->
+<MCard Style="padding-left:0px;">
+    <MTabs Height="45" BackgroundColor="white" Optional Style="padding-left:0;">
+        <MTab OnClick="@(() =>{page="Teacher";_selected=new List<MTeacher>();})">
+            课程信息
+        </MTab>
+        @if (_selectedTeacher == null)
+        {
+            <MTab Disabled>
+                教师讲台信息
+            </MTab>
+        }
+        else
+        {
+            <MTab OnClick="@(() =>{page="Class"; _selectedTeachingClass=new List<MTeachingClass>();})">
+                @_selectedTeacher.Name 的讲台信息
+            </MTab>
+        }
+    </MTabs>
 </MCard>
+
+<!--教师信息子页面-->
+@if(page.Equals("Teacher"))
+{
+    <!--信息搜索框-->
+    <MCard Class="mt-3">
+        <MForm Model="searchModel" ValueChanged="onSearch">
+            <MContainer>
+                <MRow>
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="4">
+                        <MTextField @bind-Value="searchModel.SearchInfo"
+                                    Clearable
+                                    Outlined
+                                    Dense
+                                    HideDetails="@("auto")"
+                                    Label="模糊搜索（教职工号/姓名/手机号/邮箱/职务等）">
+                        </MTextField>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="3">
+                        <MSelect Items="_allSchools"
+                                 @bind-Value="searchModel.SchoolLimit"
+                                 Clearable
+                                 TItem="MSchool"
+                                 TItemValue="int"
+                                 TValue="int"
+                                 Dense
+                                 HideDetails="@("auto")"
+                                 Outlined
+                                 Label="学院"
+                                 ItemValue="r => r.SchoolId"
+                                 ItemText="r => r.SchoolName">
+                        </MSelect>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="2"
+                          Md="1"
+                          Style="padding:18px 12px 5px  5px;">
+                        <MCheckbox @bind-value="searchModel.Resigned" TValue="bool" OnChange="onSearch" Style="margin-top:0%; padding:0%;"><LabelContent>已离职</LabelContent></MCheckbox>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="2"
+                          Md="1"
+                          Style="padding:18px 12px 5px 5px;">
+                        <MCheckbox @bind-value="searchModel.Deleted" TValue="bool" OnChange="onSearch" Style="margin-top:0%; padding:0%;"><LabelContent>已归档</LabelContent></MCheckbox>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="2"
+                          Md="2"
+                          Style="padding-top:13px;padding-bottom:0px;">
+                        <MButton OnClick="onSearch">
+                            <MIcon>mdi-card-search</MIcon>搜索
+                        </MButton>
+                    </MCol>
+                </MRow>
+            </MContainer>
+        </MForm>
+    </MCard>
+
+    <!--教师信息表格主体-->
+    ﻿<MDataTable Headers="_headers"
+                 Items="@showTeachers"
+                 @bind-Value="_selected"
+                 TItem="MTeacher"
+                 ItemKey="r => r.TeacherId.ToString()"
+                 ItemsPerPage="10"
+                 ShowSelect
+                 SelectableKey="TeacherSelectable()"
+                 Class="elevation-3 mt-5"
+                 OnRowClick="OnTeacherRowClick"
+                 OnItemSelect="@(r => {_selectedTeacher=r.Item1;})"
+                 ResizeMode="_resizeMode"
+                 FooterProps="@(props => {
+                            props.PageText="第 "+(props.Pagination.PageStart+1).ToString()+" 项-第 "+(props.Pagination.PageStop).ToString()+" 项"+"   共"+(props.Pagination.ItemsLength)+"项";
+})">
+        <TopContent>
+            <MSpacer></MSpacer>
+            <MButton Elevation="3"
+                     OnClick="AddTeacherInfo"
+                     Color="accent"
+                     Class="ml-3 mt-3">
+                <MIcon Left
+                       Class="mr-2"
+                       Color="white">
+                    mdi-account-plus
+                </MIcon>
+                添加
+            </MButton>
+            <MButton Elevation="3"
+                     OnClick="GroupResignTeacherForm"
+                     Color="accent"
+                     Class="ml-3 mt-3">
+                <MIcon Left
+                       Class="mr-2"
+                       Color="white">
+                    mdi-account-remove
+                </MIcon>
+                离职
+            </MButton>
+            <MButton Elevation="3"
+                     OnClick="GroupDeleteTeacherForm"
+                     Color="accent"
+                     Class="ml-3 mt-3">
+                <MIcon Left
+                       Class="mr-2"
+                       Color="white">
+                    mdi-delete
+                </MIcon>
+                归档
+            </MButton>
+        </TopContent>
+        <ItemColContent>
+            @if (context.Header.Value == "States")
+            {
+                @if (context.Item.EnrollmentDate == DateTime.MinValue || context.Item.EnrollmentDate > DateTime.Now)
+                {
+                    <MChip Class="ma-2"
+                           Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                                background-color:rgba(250,250,15,0.7);
+                                border-radius: 5px;
+                                border: 1px solid rgba(0, 0, 0, 0.1);">未入职</MChip>
+                }
+                else if (context.Item.IsDeleted)
+                {
+                    <MChip Class="ma-2" Disabled
+                           Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">已归档</MChip>
+                }
+                else if (context.Item.IsDeparted)
+                {
+                    <MChip Class="ma-2"
+                           Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             background-color:rgba(200,200,200,0.25);
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">已离职</MChip>
+                }
+                else if (context.Item.DepartedDate > DateTime.Today)
+                {
+                    <MChip Class="ma-2"
+                           Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             background-color:rgba(255,165,0,0.25);
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">即将离职</MChip>
+                }
+                else if (context.Item.ExpiryDate <= DateTime.Today && context.Item.IsDeparted == false)
+                {
+                    <MChip Class="ma-2"
+                           Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                                background-color:rgba(255,0,0,0.25);
+                                border-radius: 5px;
+                                border: 1px solid rgba(0, 0, 0, 0.1);">已到期</MChip>
+                }
+                else
+                {
+                    <MChip Class="ma-2"
+                           Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             background-color:rgba(0,255,0,0.25);
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">在职 </MChip>
+                }
+
+            }
+            @if (context.Header.Value == "Actions")
+            {
+                <MIcon Style="margin-right:3px;"
+                       title="查看"
+                       Color="accent"
+                       OnClick="() => ReadTeacherForm(context.Item)"
+                       Icon="@("mdi-file")">
+                </MIcon>
+                @if (context.Item.IsDeleted == false && context.Item.IsDeparted == false)
+                {
+                    <MIcon Style="margin-right:3px;"
+                           title="编辑"
+                           Color="accent"
+                           OnClick="() => EditTeacherForm(context.Item)"
+                           Icon="@("mdi-pencil")">
+                    </MIcon>
+                }
+                else
+                {
+                    <MIcon Style="margin-right:3px;"
+                           title="编辑"
+                           Color="accent"
+                           Disabled
+                           Icon="@("mdi-pencil")">
+                    </MIcon>
+                }
+                @if (context.Item.IsDeleted == false && context.Item.IsDeparted == false && context.Item.EnrollmentDate != DateTime.MinValue && context.Item.EnrollmentDate <= DateTime.Today)
+                {
+                    <MIcon OnClick="() => ResignTeacherForm(context.Item)"
+                           Style="margin-right:3px;"
+                           Color="accent"
+                           title="离职"
+                           Icon="@("mdi-account-remove")">
+                    </MIcon>
+                }
+                else
+                {
+                    <MIcon Disabled
+                           Style="margin-right:3px;"
+                           Color="accent"
+                           title="离职"
+                           Icon="@("mdi-account-remove")">
+                    </MIcon>
+                }
+                @if (context.Item.IsDeleted == false)
+                {
+                    <MIcon title="归档"
+                           Color="accent"
+                           OnClick="() => DeleteTeacherForm(context.Item)"
+                           Icon="@(" mdi-delete")">
+                    </MIcon>
+                }
+                else
+                {
+                    <MIcon title="归档"
+                           Color="accent"
+                           Disabled
+                           Icon="@(" mdi-delete")">
+                    </MIcon>
+                }
+
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </MDataTable>
+}
+
+<!--教师执教的讲台信息子页面-->
+@* else
+{
+    <MCard Class="mt-3">
+        <MCardTitle Style="padding-bottom:0;">@_selectedTeacher.Name 的讲台列表</MCardTitle>
+        <MCardText Style="padding-left:0px;">
+            <MDataTable ShowSelect
+                        @bind-Value="_selectedTeachingClass"
+                        ItemKey="r => r.ClassPMID"
+                        Headers="_classHeader"
+                        Items="_showTeachingClass"
+                        SelectableKey="ClassSelectable()"
+                        FooterProps="@(props => {
+                        props.PageText="第 "+(props.Pagination.PageStart+1).ToString()+" 项-第 "+(props.Pagination.PageStop).ToString()+" 项"+"   共"+(props.Pagination.ItemsLength)+"项";
+                        })">
+                <TopContent>
+                    <MSpacer></MSpacer>
+                    <MButton Elevation="3"
+                             Disabled
+                             Color="accent"
+                             Class="mt-3 ml-3">
+                        <MIcon Left
+                               Class="mr-2"
+                               Color="white">
+                            mdi-account-plus
+                        </MIcon>
+                        添加讲台
+                    </MButton>
+                    <MButton Elevation="3"
+                             OnClick="ClassGroupDeleteForm"
+                             Color="accent"
+                             Class="ml-3 mt-3">
+                        <MIcon Left
+                               Class="mr-2"
+                               Color="white">
+                            mdi-delete
+                        </MIcon>
+                        归档
+                    </MButton>
+                </TopContent>
+                <ItemColContent>
+                    @if(context.Header.Value == "States")
+                    {
+                        @if (context.Item.IsDeleted)
+                        {
+                            <MChip Class="ma-2" Disabled
+                                   Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">已归档</MChip>
+                        }
+                        else
+                        {
+                            <MChip Class="ma-2"
+                                   Style="width:70px;
+                                padding:5px;
+                                align-content:center;
+                                justify-content:center;
+                                align-items:center;
+                                text-align:center;
+                             background-color:rgba(0,255,0,0.25);
+                             border-radius: 5px;
+                             border: 1px solid rgba(0, 0, 0, 0.1);">正常 </MChip>
+                        }
+                    }
+                    @if (context.Header.Value == "Actions")
+                    {
+                        <MIcon Style="margin-right:3px;"
+                               title="查看"
+                               Color="accent"
+                               OnClick="() => ReadClassForm(context.Item)"
+                               Icon="@("mdi-file")">
+                        </MIcon>
+                        @if (context.Item.IsDeleted == false)
+                        {
+                            <MIcon Style="margin-right:3px;"
+                                   title="编辑"
+                                   Color="accent"
+                                   OnClick="() => EditClassForm(context.Item)"
+                                   Icon="@("mdi-pencil")">
+                            </MIcon>
+                        }
+                        else
+                        {
+                            <MIcon Style="margin-right:3px;"
+                                   title="编辑"
+                                   Color="accent"
+                                   Disabled
+                                   Icon="@("mdi-pencil")">
+                            </MIcon>
+                        }
+                        @if (context.Item.IsDeleted == false)
+                        {
+                            <MIcon title="归档"
+                                   Color="accent"
+                                   OnClick="() => DeleteClassForm(context.Item)"
+                                   Icon="@(" mdi-delete")">
+                            </MIcon>
+                        }
+                        else
+                        {
+                            <MIcon title="归档"
+                                   Color="accent"
+                                   Disabled
+                                   Icon="@(" mdi-delete")">
+                            </MIcon>
+                        }
+
+                    }
+                    else
+                    {
+                        @context.Value
+                    }
+                </ItemColContent>
+            </MDataTable>
+        </MCardText>
+    </MCard>
+} 
+*@
 
 <!--添加教师信息按钮呼出的表单-->
 <MRow Justify="JustifyTypes.Center">
@@ -357,209 +709,6 @@
         </MCard>
     </ChildContent>
 </MDialog>
-
-<!--教师信息表格主体-->
-﻿<MDataTable Headers="_headers"
-             Items="@showTeachers"
-             @bind-Value="_selected"
-             ItemKey="r => r.TeacherId.ToString()"
-             ItemsPerPage="10"
-             ShowSelect
-             SelectableKey="TeacherSelectable()"
-             Class="elevation-3 mt-5"
-             ResizeMode="_resizeMode"
-            FooterProps="@(props => {
-                            props.PageText="第 "+(props.Pagination.PageStart+1).ToString()+" 项-第 "+(props.Pagination.PageStop).ToString()+" 项"+"   共"+(props.Pagination.ItemsLength)+"项";
-})">
-    <TopContent>
-        <MSpacer></MSpacer>
-        <MButton 
-                 Elevation="3"
-                 OnClick="AddTeacherInfo"
-                 Color="accent"
-                 Class="ml-3 mt-3">
-            <MIcon Left
-                   Class="mr-2"
-                   Color="white">
-                mdi-account-plus
-            </MIcon>
-            添加
-        </MButton>
-        <MButton 
-                 Elevation="3"
-                 OnClick="GroupResignTeacherForm"
-                 Color="accent"
-                 Class="ml-3 mt-3">
-            <MIcon Left
-                   Class="mr-2"
-                   Color="white">
-                mdi-account-remove
-            </MIcon>
-            离职
-        </MButton>
-        <MButton 
-                 Elevation="3"
-                 OnClick="GroupDeleteTeacherForm"
-                 Color="accent"
-                 Class="ml-3 mt-3">
-            <MIcon Left
-                   Class="mr-2"
-                   Color="white">
-                mdi-delete
-            </MIcon>
-            归档
-        </MButton>
-    </TopContent>
-    <ItemColContent>
-        @if (context.Header.Value == "States")
-        {
-            @if (context.Item.EnrollmentDate == DateTime.MinValue || context.Item.EnrollmentDate > DateTime.Now)
-            {
-                <MChip Class="ma-2" 
-                        Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                                background-color:rgba(250,250,15,0.7);
-                                border-radius: 5px; 
-                                border: 1px solid rgba(0, 0, 0, 0.1);">未入职</MChip>
-            }
-            else if (context.Item.IsDeleted)
-            {
-                <MChip Class="ma-2" Disabled
-                       Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                             border-radius: 5px; 
-                             border: 1px solid rgba(0, 0, 0, 0.1);">已归档</MChip>
-            }
-            else if (context.Item.IsDeparted)
-            {
-                <MChip Class="ma-2" 
-                        Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                             background-color:rgba(200,200,200,0.25);
-                             border-radius: 5px;
-                             border: 1px solid rgba(0, 0, 0, 0.1);">已离职</MChip>
-            }
-            else if (context.Item.DepartedDate>DateTime.Today)
-            {
-                <MChip Class="ma-2"
-                       Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                             background-color:rgba(255,165,0,0.25);
-                             border-radius: 5px;
-                             border: 1px solid rgba(0, 0, 0, 0.1);">即将离职</MChip>
-            }
-            else if (context.Item.ExpiryDate<=DateTime.Today&&context.Item.IsDeparted==false)
-            {
-                <MChip Class="ma-2" 
-                        Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                                background-color:rgba(255,0,0,0.25);
-                                border-radius: 5px; 
-                                border: 1px solid rgba(0, 0, 0, 0.1);">已到期</MChip>
-            }
-            else
-            {
-                <MChip Class="ma-2" 
-                        Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                             background-color:rgba(0,255,0,0.25);
-                             border-radius: 5px;
-                             border: 1px solid rgba(0, 0, 0, 0.1);">在职 </MChip>
-            }
-
-        }
-        @if (context.Header.Value == "Actions")
-        {
-            <MIcon Style="margin-right:3px;"
-                   title="查看"
-                   Color="accent"
-                   OnClick="() => ReadTeacherForm(context.Item)"
-                   Icon="@("mdi-file")">
-            </MIcon>
-            @if (context.Item.IsDeleted == false && context.Item.IsDeparted == false)
-            {
-                <MIcon Style="margin-right:3px;"
-                       title="编辑"
-                       Color="accent"
-                       OnClick="() => EditTeacherForm(context.Item)"
-                       Icon="@("mdi-pencil")">
-                </MIcon>
-            }
-            else
-            {
-                <MIcon Style="margin-right:3px;"
-                       title="编辑"
-                       Color="accent"
-                       Disabled
-                       Icon="@("mdi-pencil")">
-                </MIcon>
-            }
-            @if (context.Item.IsDeleted==false&&context.Item.IsDeparted==false &&context.Item.EnrollmentDate != DateTime.MinValue && context.Item.EnrollmentDate <= DateTime.Today)
-                {
-                    <MIcon OnClick="() => ResignTeacherForm(context.Item)"
-                           Style="margin-right:3px;"
-                           Color="accent"
-                           title="离职"
-                           Icon="@("mdi-account-remove")">
-                </MIcon>
-            }
-            else
-            {
-                <MIcon Disabled
-                       Style="margin-right:3px;"
-                       Color="accent"
-                       title="离职"
-                       Icon="@("mdi-account-remove")">
-                </MIcon>
-            }
-            @if (context.Item.IsDeleted == false)
-            {
-                <MIcon title="归档"
-                        Color="accent"
-                        OnClick="() => DeleteTeacherForm(context.Item)"
-                        Icon="@(" mdi-delete")">
-                </MIcon>
-            }
-            else
-            {
-                <MIcon title="归档"
-                       Color="accent"
-                       Disabled
-                       Icon="@(" mdi-delete")">
-                </MIcon>
-            }
-
-        }
-        else
-        {
-            @context.Value
-        }
-    </ItemColContent>
-</MDataTable>
 
 <!--通用报错弹窗-->
 <MDialog @bind-Value="_errorVisiable"
@@ -1455,7 +1604,7 @@
 </MDialog>
 
 <!--归档用选框-->    
-<MDialog @bind-Value="_DeleteC" MaxWidth="500">
+<MDialog @bind-Value="_deleteTeacherC" MaxWidth="500">
     <MCard>
         <MCardTitle Class="text-h5">你确定要归档该条教师信息：@mTeacher.Name ?</MCardTitle>
         <MCardText>
@@ -1543,7 +1692,7 @@
                     </MCol>
                 </MRow>
             </MContainer>
-            <MForm Model="mTeacher" @bind-Value="_deleteValid" OnValidSubmit="DeleteConfirm">
+            <MForm Model="mTeacher" @bind-Value="_deleteTeacherValid" OnValidSubmit="DeleteConfirm">
                 <MTextarea TValue="string"
                            TItemValue="string"
                            @bind-Value="mTeacher.DeleteReason"
@@ -1571,21 +1720,21 @@
 
                     <MButton Text
                              Outlined
-                             Disabled="@(_deleteButtonTime!=0||!_deleteValid)"
+                             Disabled="@(_deleteButtonTime!=0||!_deleteTeacherValid)"
                              Type="submit">
                         @(_deleteButtonTime == 0 ? "确认" : "确认(" + $" {_deleteButtonTime} 秒)")
                     </MButton>
                     <MButton Color="black"
                              Outlined
                              Text
-                             OnClick="() => _DeleteC = false">
+                             OnClick="() => _deleteTeacherC = false">
                         取消
                     </MButton>
                     <MSpacer></MSpacer>
                 </MCardActions>
             </MForm>
         </MCardText>
-        <MDialog @bind-Value="_deleteCompleteVisiable"
+        <MDialog @bind-Value="_deleteTeacherCompleteVisiable"
                  MaxWidth="400">
             <ChildContent>
                 <MCard>
@@ -1595,7 +1744,7 @@
                     <MCardActions>
                         <MSpacer></MSpacer>
                         <MButton Text
-                                 OnClick="() => { UpdateTeacherInfoInCache(); _deleteCompleteVisiable = false; _DeleteC = false; }">
+                                 OnClick="() => { UpdateTeacherInfoInCache(); _deleteTeacherCompleteVisiable = false; _deleteTeacherC = false; }">
                             确认
                         </MButton>
                     </MCardActions>
@@ -1662,7 +1811,7 @@
                     </MCol>
                 </MRow>
             </MContainer>
-            <MForm Model="_selected" @bind-Value="_deleteValid" OnValidSubmit="GroupDeleteConfirm">
+            <MForm Model="_selected" @bind-Value="_deleteTeacherValid" OnValidSubmit="GroupDeleteConfirm">
                 <MTextarea TValue="string"
                            TItemValue="string"
                            @bind-Value="_deleteReason"
@@ -1694,7 +1843,7 @@
 
                     <MButton Text
                              Outlined
-                             Disabled="@(_deleteButtonTime!=0||!_deleteValid)"
+                             Disabled="@(_deleteButtonTime!=0||!_deleteTeacherValid)"
                              Type="submit">
                         @(_deleteButtonTime == 0 ? "确认" : "确认(" + $" {_deleteButtonTime} 秒)")
                     </MButton>
@@ -1772,26 +1921,65 @@
                 }"></MDatePicker>
 </MDialog>
 
+
 @code {
+    /*------------------------------------存储变量------------------------------------*/
     const string yes = "是";
     const string no = "否";
+    /// <summary>
+    /// 教师操作用选取
+    /// </summary>
+    private IEnumerable<MTeacher> _selected = new List<MTeacher>();
+    /// <summary>
+    /// 讲台操作用选取
+    /// </summary>
+    private IEnumerable<MTeachingClass> _selectedTeachingClass = new List<MTeachingClass>();
+    /// <summary>
+    /// 课程页面用选取
+    /// </summary>
+    private MTeacher _selectedTeacher= null;
 
-    /*------------------------启动-------------------------------*/
-    // 通用通知栏
+    /// <summary>
+    /// 所有教师信息
+    /// </summary>
+    private List<MTeacher> _teacherInfo;
+
+    /// <summary>
+    /// 所有学院信息
+    /// </summary>
+    private List<MSchool> _allSchools;
+
+    /// <summary>
+    /// 展示的教师信息
+    /// </summary>
+    private List<MTeacher> showTeachers = new List<MTeacher>();
+
+    /// <summary>
+    /// 所有教学班信息
+    /// </summary>
+    private Dictionary<string, List<MTeachingClass>> _teachingClasses = new Dictionary<string, List<MTeachingClass>>();
+
+    /// <summary>
+    /// 展示的教学班信息
+    /// </summary>
+    private List<MTeachingClass> _showTeachingClass = new List<MTeachingClass>();
+    /*------------------------------------启动------------------------------------*/
+
+    /// <summary>
+    /// 通用报错栏使用变量
+    /// </summary>
     private string? _errorMessage = null;
     private bool _errorVisiable = false;
 
-    // 缓存读数据
-    private List<MTeacher> teacherInfo;
-    private List<MSchool> _allSchools;
-    List<MTeacher> showTeachers = new List<MTeacher>();
-
-    // 查看/更新缓存中教师信息
+    /// <summary>
+    /// 查看/更新缓存中教师信息
+    /// </summary>
+    /// <returns></returns>
     private List<MTeacher> LoadTeacherInfoFromCacheAsync()
     {
         const string cacheItemKey = "CachedInfo";
 
-        if (!MemoryCache.TryGetValue(cacheItemKey, out List<MTeacher> cachedTeacherInfo) || cachedTeacherInfo.Count == 0)
+        if (!MemoryCache.TryGetValue(cacheItemKey, out List<MTeacher> cachedTeacherInfo))
         {
             cachedTeacherInfo = TeacherService.GetAllTeachers();
 
@@ -1800,11 +1988,14 @@
 
             MemoryCache.Set(cacheItemKey, cachedTeacherInfo, cacheEntryOptions);
         }
-
+        _teacherInfo = cachedTeacherInfo;
         return cachedTeacherInfo;
     }
 
-    // 查看/更新缓存中学院信息
+    /// <summary>
+    /// 查看/更新缓存中学院信息
+    /// </summary>
+    /// <returns></returns>
     private List<MSchool> LoadSchoolInfoFromCacheAsync()
     {
         const string schoolCacheKey = "CachedSchoolInfo";
@@ -1818,16 +2009,41 @@
 
             MemoryCache.Set(schoolCacheKey, cachedSchools, cacheEntryOptions);
         }
-
+        _allSchools = cachedSchools;
         return cachedSchools;
     }
 
-    // 启动时调用缓存中信息
+    /// <summary>
+    /// 查看/更新缓存中教学班信息
+    /// </summary>
+    /// <returns></returns>
+    private Dictionary<string, List<MTeachingClass>> LoadClassInfoFromCacheAsync()
+    {
+        const string cacheItemKey = "CachedClassInfo";
+
+        if (!MemoryCache.TryGetValue(cacheItemKey, out Dictionary<string, List<MTeachingClass>> cachedClassInfo) || cachedClassInfo.Count == 0)
+        {
+            cachedClassInfo = TeachingClassService.GetAllTeachingClassGroupByTeacher();
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromSeconds(23));
+
+            MemoryCache.Set(cacheItemKey, cachedClassInfo, cacheEntryOptions);
+
+        }
+        _teachingClasses = cachedClassInfo;
+        return cachedClassInfo;
+    }
+
+    /// <summary>
+    /// 启动时调用缓存中信息
+    /// </summary>
     protected override void OnInitialized()
     {
         // 使用缓存中的数据
-        teacherInfo = LoadTeacherInfoFromCacheAsync();
-        _allSchools = LoadSchoolInfoFromCacheAsync();
+        LoadTeacherInfoFromCacheAsync();
+        LoadSchoolInfoFromCacheAsync();
+        LoadClassInfoFromCacheAsync();
         onSearch();
     }
 
@@ -1836,13 +2052,13 @@
     /// </summary>
     private void UpdateTeacherInfoInCache()
     {
-        teacherInfo = TeacherService.GetAllTeachers();
+        _teacherInfo = TeacherService.GetAllTeachers();
 
         // 更新缓存
         var cacheEntryOptions = new MemoryCacheEntryOptions()
             .SetSlidingExpiration(TimeSpan.FromSeconds(30));
 
-        MemoryCache.Set("CachedInfo", teacherInfo, cacheEntryOptions);
+        MemoryCache.Set("CachedInfo", _teacherInfo, cacheEntryOptions);
         onSearch();
         StateHasChanged();
         return;
@@ -1933,7 +2149,6 @@
         }
     };
 
-    private IEnumerable<MTeacher> _selected = new List<MTeacher>();
     /// <summary>
     /// 判断表格教师行是否可选
     /// </summary>
@@ -1947,7 +2162,98 @@
     };
     }
 
-    /*----------------------操作栏---------------------------*/
+    /*---------------------------------------导航栏--------------------------------------*/
+    /// <summary>
+    /// 导航标签页用变量
+    /// </summary>
+    private string page = "Teacher";
+
+    /// <summary>
+    /// 点击教师行时切换选取教师
+    /// </summary>
+    private void OnTeacherRowClick(DataTableRowMouseEventArgs<MTeacher> cour)
+    {
+        _selectedTeacher = cour.Item;
+        _showTeachingClass = new List<MTeachingClass>();
+        _selectedTeachingClass = new List<MTeachingClass>();
+        foreach (var item in _teachingClasses)
+        {
+            if (item.Key.Equals(_selectedTeacher.EmployeeID))
+            {
+                _showTeachingClass=item.Value;
+            }
+        }
+    }
+
+    /*---------------------------------------操作栏--------------------------------------*/
+
+
+    /*--------------------添加教师------------------------*/
+
+    MTeacher mTeacher = null;
+    // 表单填写检查
+    private bool _valid = false;
+    private bool completeVisiable = false;
+
+
+    // 记录表单弹出/关闭
+    private bool dialog = false;
+    private bool _enrollC = false;
+    private bool _expiryC = false;
+
+    // 接收表格属性
+    private DateOnly _enrollmentDate = DateOnly.MinValue;
+    private DateOnly _expiryDate = DateOnly.MinValue;
+
+    // 添加按钮点击事件，打开添加信息表单
+    private void AddTeacherInfo()
+    {
+        mTeacher = new MTeacher();
+        // mTeacher.EmployeeID = TeacherService.GetEmployeeID();
+        dialog = true;
+        mTeacher.EnrollmentDate = DateTime.MinValue;
+        mTeacher.ExpiryDate = DateTime.MinValue;
+        _enrollmentDate = DateOnly.MinValue;
+        _expiryDate = DateOnly.MinValue;
+    }
+
+    /// <summary>
+    /// 检查表单信息，有误则报错，无误则提交表单
+    /// </summary>
+    private void SubmitTeacherInfo()
+    {
+        // 入职日期和合同到期日期必须同时输入
+        if (mTeacher.ExpiryDate != DateTime.MinValue && mTeacher.EnrollmentDate == DateTime.MinValue)
+        {
+
+            _errorMessage = "请输入入职日期！";
+            _errorVisiable = true;
+            return;
+        }
+        if (mTeacher.EnrollmentDate != DateTime.MinValue && mTeacher.ExpiryDate == DateTime.MinValue)
+        {
+            _errorMessage = "请输入合同到期日期！";
+            _errorVisiable = true;
+            return;
+        }
+        // EnrollmentDate is not earlier than ExpiryDate
+        if (mTeacher.EnrollmentDate != DateTime.MinValue && mTeacher.ExpiryDate != DateTime.MinValue && mTeacher.EnrollmentDate >= mTeacher.ExpiryDate)
+        {
+            _errorMessage = "合同到期日期不能早于入职日期！";
+            _errorVisiable = true;
+            return;
+        }
+        _errorMessage = TeacherService.AddTeacherInfo(mTeacher);
+        if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            _errorVisiable = true;
+            return;
+        }
+        completeVisiable = true;
+
+        return;
+    }
+
 
     /*----------------读取教师信息----------------*/
     private bool _readC = false;
@@ -1965,25 +2271,54 @@
 
 
     /*----------------归档教师信息----------------*/
-    private bool _DeleteC = false;
-    private bool _deleteValid = false;
-    private bool _deleteCompleteVisiable = false;
+    private bool _deleteTeacherC = false;
+    private bool _deleteTeacherValid = false;
+    private bool _deleteTeacherCompleteVisiable = false;
     private int _deleteButtonTime = 3;
+
+    /// <summary>
+    /// 存储按钮禁用时间的异步任务
+    /// </summary>
+    private Task _disableButtonTask;
+    /// <summary>
+    /// 控制按钮禁用时间异步任务
+    /// </summary>
+    private CancellationTokenSource _cancellationTokenSource;
 
     /// <summary>
     /// 归档窗口确认按钮限制
     /// </summary>
-    private async void DisableButtonTemporarily()
+    /// <param name="token"></param>
+    /// <returns></returns>
+    private async Task DisableButtonTemporarily(CancellationToken token)
     {
         _deleteButtonTime = 3;
         StateHasChanged(); // 立即更新UI
-        _deleteValid = false;
+        _deleteTeacherValid = false;
         for (; _deleteButtonTime > 0; _deleteButtonTime--)
         {
             StateHasChanged(); // 更新UI以显示剩余时间
-            await Task.Delay(1000); // 等待1秒
+            await Task.Delay(1000, token); // 等待1秒
         }
+        _deleteTeacherValid = true;
         StateHasChanged(); // 更新UI以启用按钮
+        _disableButtonTask = null;
+    }
+
+    /// <summary>
+    /// 中断旧的倒计时任务并启动新的倒计时
+    /// </summary>
+    private void ActivateDisableButton()
+    {
+        if (_disableButtonTask != null && !_disableButtonTask.IsCompleted)
+        {
+            // 如果当前倒计时的异步任务未结束，取消它并重新启动
+            _cancellationTokenSource.Cancel(); // 取消
+            _disableButtonTask = null;
+        }
+        // 启动新任务
+        _cancellationTokenSource = new CancellationTokenSource();
+        _disableButtonTask = DisableButtonTemporarily(_cancellationTokenSource.Token);
     }
 
     /// <summary>
@@ -1994,9 +2329,9 @@
     {
         mTeacher = CopyUtil<MTeacher, MTeacher>.Trans(teacher);
         _deleteButtonTime = 3;
-        DisableButtonTemporarily();
-        _DeleteC = true;
-        _deleteValid = false;
+        ActivateDisableButton();
+        _deleteTeacherC = true;
+        _deleteTeacherValid = false;
         _enrollmentDate = DateOnly.FromDateTime(mTeacher.EnrollmentDate);
         _expiryDate = DateOnly.FromDateTime(mTeacher.ExpiryDate);
     }
@@ -2007,7 +2342,7 @@
         List<MTeacher> list = new List<MTeacher> { mTeacher };
         _errorMessage = TeacherService.DeleteTeacher(list);
         if (!string.IsNullOrEmpty(_errorMessage)) _errorVisiable = true;
-        else _deleteCompleteVisiable = true;
+        else _deleteTeacherCompleteVisiable = true;
     }
 
     // 批量
@@ -2029,12 +2364,12 @@
             return;
         }
         _deleteButtonTime = 3;
-        DisableButtonTemporarily();
+        ActivateDisableButton();
         _DeleteGroupC = true;
         _deleteReason = null;
         _deleteGroupCompleteVisiable = false;
         _deleteDescription = null;
-        _deleteValid = false;
+        _deleteTeacherValid = false;
 
     }
 
@@ -2247,8 +2582,7 @@
 
         return;
     }
-
-    /*--------------------搜索框------------------------*/
+    /*--------------------------------------------搜索框---------------------------------------------*/
 
 
     class SearchModel
@@ -2272,11 +2606,11 @@
         showTeachers.Clear();
         if (string.IsNullOrEmpty(searchModel.SearchInfo) && searchModel.SchoolLimit == 0 && searchModel.Deleted == true && searchModel.Resigned == true)
         {
-            showTeachers.AddRange(teacherInfo);
+            showTeachers.AddRange(_teacherInfo);
         }
         else
         {
-            foreach (var tec in teacherInfo)
+            foreach (var tec in _teacherInfo)
             {
                 // 检查教师信息是否包含搜索关键字或符合学院限制
                 if ((string.IsNullOrEmpty(searchModel.SearchInfo)
@@ -2299,74 +2633,7 @@
         StateHasChanged();
     }
 
-    /*--------------------添加教师------------------------*/
-
-    MTeacher mTeacher = null;
-    // 表单填写检查
-    private bool _valid = false;
-    private bool completeVisiable = false;
-
-
-    // 记录表单弹出/关闭
-    private bool dialog = false;
-    private bool _enrollC = false;
-    private bool _expiryC = false;
-
-    // 接收表格属性
-    private DateOnly _enrollmentDate = DateOnly.MinValue;
-    private DateOnly _expiryDate = DateOnly.MinValue;
-
-    // 添加按钮点击事件，打开添加信息表单
-    private void AddTeacherInfo()
-    {
-        mTeacher = new MTeacher();
-        // mTeacher.EmployeeID = TeacherService.GetEmployeeID();
-        dialog = true;
-        mTeacher.EnrollmentDate = DateTime.MinValue;
-        mTeacher.ExpiryDate = DateTime.MinValue;
-        _enrollmentDate = DateOnly.MinValue;
-        _expiryDate = DateOnly.MinValue;
-    }
-
-    /// <summary>
-    /// 检查表单信息，有误则报错，无误则提交表单
-    /// </summary>
-    private void SubmitTeacherInfo()
-    {
-        // 入职日期和合同到期日期必须同时输入
-        if (mTeacher.ExpiryDate != DateTime.MinValue && mTeacher.EnrollmentDate == DateTime.MinValue)
-        {
-
-            _errorMessage = "请输入入职日期！";
-            _errorVisiable = true;
-            return;
-        }
-        if (mTeacher.EnrollmentDate != DateTime.MinValue && mTeacher.ExpiryDate == DateTime.MinValue)
-        {
-            _errorMessage = "请输入合同到期日期！";
-            _errorVisiable = true;
-            return;
-        }
-        // EnrollmentDate is not earlier than ExpiryDate
-        if (mTeacher.EnrollmentDate != DateTime.MinValue && mTeacher.ExpiryDate != DateTime.MinValue && mTeacher.EnrollmentDate >= mTeacher.ExpiryDate)
-        {
-            _errorMessage = "合同到期日期不能早于入职日期！";
-            _errorVisiable = true;
-            return;
-        }
-        _errorMessage = TeacherService.AddTeacherInfo(mTeacher);
-        if (!string.IsNullOrEmpty(_errorMessage))
-        {
-            _errorVisiable = true;
-            return;
-        }
-        completeVisiable = true;
-
-        return;
-    }
-
-
-    /*-----------表单输入限制-----------*/
+    /*------------------------------------------表单输入限制-----------------------------------------*/
 
     // 姓名
     private IEnumerable<Func<string, StringBoolean>> _nameRules = new List<Func<string, StringBoolean>>

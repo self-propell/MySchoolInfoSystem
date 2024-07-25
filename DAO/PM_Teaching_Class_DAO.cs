@@ -14,7 +14,7 @@ namespace SchPeoManageWeb.DAO
     public class PM_Teaching_Class_DAO:BASE_DAO<MTeachingClass>
     {
         /// <summary>
-        /// 获取所有教学班级
+        /// 获取所有教学班级[joined teacher、course，获取了Course_name/Teacher_name]
         /// </summary>
         /// <returns></returns>
         public List<MTeachingClass> GetAllTeachingClass()
