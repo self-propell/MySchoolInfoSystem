@@ -44,7 +44,7 @@ namespace SchPeoManageWeb.DAO
         }
 
         /// <summary>
-        /// 传入类型名
+        /// 根据类型名查询DictData信息
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>

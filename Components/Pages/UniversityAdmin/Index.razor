@@ -4,10 +4,92 @@
 <PageTitle>UniversityAdmin</PageTitle>
 
 <h1>学校行政管理</h1>
+<!--讲台上课时间弹窗-->
+    <MCard>
+        <MCardTitle>上课时间选择</MCardTitle>
+        <MCardText>
+            <MRow>
+                <MCol
+                    Cols="12"
+                    Lg="6"
+                    Md="6"
+                    Sm="12">
+                    <MButton>选择上课周数</MButton>
+                </MCol>
+            <MCol Cols="12"
+                  Lg="6"
+                  Md="6"
+                  Sm="12">
+                  <MButton>占位</MButton>
+            </MCol>
+        </MRow>
+            <MRow>
+                <MCol Cols="2" Style="background-color:red;">
+                    时间
+                </MCol>
+                <MCol Cols="2" Style="background-color:blue;">
+                    周一
+                </MCol>
+                <MCol Cols="2" Style="background-color:green;">
+                    周二
+                </MCol>
+                <MCol Cols="2" Style="background-color:yellow;">
+                    周三
+                </MCol>
+                <MCol Cols="2" Style="background-color:lightblue;">
+                    周四
+                </MCol>
+                <MCol Cols="2" Style="background-color:lightcoral;">
+                    周五
+                </MCol>
+            </MRow>
+            <MRow>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5;">
+                    <div style="text-align:center">第一大节</div>
+                    <div style="text-align:center">8:00~9:30</div>
+                </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5;">
+                    
+                </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5;">
+                    
+                </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5;">
+                    
+                </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5;">
+                    
+                </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5;">
+                    
+                </MCol>
+            </MRow>
+            <MRow>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5; ">
+                    <div style="text-align:center">第二大节</div>
+                    <div style ="text-align:center">8:00~9:30</div>
+                </MCol>
+            <MCol Cols="2" Style="border:solid 1px #E5E5E5;padding:0px; ">
+                <MSimpleCheckbox Style="Height:100%;" @bind-Value="temp"></MSimpleCheckbox>
+                    </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5; ">
 
+                    </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5; ">
+
+                    </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5; ">
+
+                </MCol>
+                <MCol Cols="2" Style="border:solid 1px #E5E5E5; ">
+
+                </MCol>
+            </MRow>
+        </MCardText>
+    </MCard>
 
 
 
 @code {
-    
+    bool temp;
 }

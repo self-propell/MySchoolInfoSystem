@@ -1159,14 +1159,23 @@
                                 <MCol Cols="12"
                                       Sm="6"
                                       Md="6">
-                                    <MTextField Autofocus
+                                    <MCascader 
                                                 Label="上课地点"
-                                                @bind-Value=mTeachingClass.Location
+                                                Delimiter="-"
                                                 TValue="string"
+                                                Items="_buildings"
+                                                TItem="MBuilding"
+                                                ItemChildren="u => u.Classrooms"
+                                               ChangeOnSelect
+                                                LoadChildren="FetchBuildingChildrenAsync"
+                                                ItemText="r => r.BuildingName"
+                                                ItemValue="r => r.TreeName"
+                                               Clearable
+                                                @bind-Value="mTeachingClass.Location"
                                                 Outlined
                                                 Dense
                                                 HideDetails="@("auto")">
-                                    </MTextField>
+                                    </MCascader>
                                 </MCol>
                                 <MCol Cols="12"
                                       Sm="6"
@@ -1227,7 +1236,7 @@
                 <MSpacer></MSpacer>
                 <MButton Color="black"
                          Text
-                         OnClick="() => {UpdateCourseInfoInCache();_addClassCompleteVisiable = false;_addClassC=false;}">
+                         OnClick="() => {UpdateClassInfoInCache();_addClassCompleteVisiable = false;_addClassC=false;}">
                     确认
                 </MButton>
             </MCardActions>
@@ -1567,14 +1576,22 @@
                                 <MCol Cols="12"
                                       Sm="6"
                                       Md="6">
-                                    <MTextField Autofocus
-                                                Label="上课地点"
-                                                @bind-Value=mTeachingClass.Location
-                                                TValue="string"
-                                                Outlined
-                                                Dense
-                                                HideDetails="@("auto")">
-                                    </MTextField>
+                                    <MCascader Label="上课地点"
+                                               Delimiter="-"
+                                               TValue="string"
+                                               Items="_buildings"
+                                               TItem="MBuilding"
+                                               ItemChildren="u => u.Classrooms"
+                                               ChangeOnSelect
+                                               LoadChildren="FetchBuildingChildrenAsync"
+                                               ItemText="r => r.BuildingName"
+                                               ItemValue="r => r.TreeName"
+                                               @bind-Value="mTeachingClass.Location"
+                                               Outlined
+                                               Dense
+                                               Clearable
+                                               HideDetails="@("auto")">
+                                    </MCascader>
                                 </MCol>
                                 <MCol Cols="12"
                                       Sm="6"
@@ -1895,13 +1912,9 @@
     </MCard>
 </MDialog>
 
-<!--讲台上课时间弹窗-->
 
 
 @code {
-    string yes = "是";
-    string no = "否";
-
     /*-------------------------------------------------------------启动------------------------------------------------------------------*/
     // 页面选择
     private string page = "Course";
@@ -1920,14 +1933,77 @@
     private List<MData> _semesters = new List<MData>();
     private Dictionary<string, List<MTeachingClass>> _teachingClasses = new Dictionary<string, List<MTeachingClass>>();
     private List<MTeachingClass> _showTeachingClass = new List<MTeachingClass>();
+    private List<MClassroom> _classroom = new List<MClassroom>();
+    private List<MBuilding> _buildings = new List<MBuilding>();
+
     /// <summary>
-    /// 查看/更新缓存中的学期、性质信息
+    /// 异步获取建筑下有的楼层、教室信息
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
+    public async Task FetchBuildingChildrenAsync(MBuilding node)
+    {
+        // 获取当前建筑物的所有教室数据
+        var classrooms = await GetClassroomsAsync(node.BuildingID);
+
+        // 按楼层分类教室
+        var groupedByFloor = classrooms
+            .Where(item => item.ParentBuildingID == node.BuildingID)
+            .GroupBy(item => item.Floor);
+
+        var floorNodes = new List<MBuilding>();
+
+        foreach (var floorGroup in groupedByFloor)
+        {
+            // 创建楼层节点
+            var floorNode = new MBuilding
+                {
+                    BuildingID = (node.BuildingID *1000) + floorGroup.Key, // 楼层节点的ID[1000~99999]
+                    BuildingName = $"{floorGroup.Key}楼",
+                    TreeName = node.BuildingName + "-" + $"{floorGroup.Key}楼",
+                    Classrooms = new List<MBuilding>()
+                };
+
+            // 添加该楼层的教室节点
+            foreach (var classroom in floorGroup)
+            {
+                var classroomNode = new MBuilding
+                    {
+                        BuildingID = (node.BuildingID*100000) + classroom.ClassroomID, // 教室节点的ID[100000+]
+                        BuildingName = classroom.Name,
+                        TreeName=node.BuildingName+"-"+classroom.Name,
+                        Classrooms = null
+                    };
+                floorNode.Classrooms.Add(classroomNode);
+            }
+
+            floorNodes.Add(floorNode);
+        }
+
+        node.Classrooms = floorNodes.Any() ? floorNodes : null;
+    }
+    /// <summary>
+    /// 异步获取建筑下属的教室信息
+    /// </summary>
+    /// <param name="buildingId"></param>
+    /// <returns></returns>
+    private Task<List<MClassroom>> GetClassroomsAsync(int buildingId)
+    {
+        return Task.Run(() => _classroom.Where(c => c.ParentBuildingID == buildingId).ToList());
+    }
+
+
+    /// <summary>
+    /// 查看/更新缓存中的长效信息：学期、性质、教室、楼栋
     /// </summary>
     private void LoadLongEffectiveInfo()
     {
         string cacheMajorKey = "CachedMajorInfo";
         string cacheSemesterKey = "CachedSemestersInfo";
-        if (!MemoryCache.TryGetValue(cacheMajorKey, out List<MMajor> cachedMajors) || _allMajors.Count == 0)
+        string cacheBuildingKey = "CachedBuildingInfo";
+        string cacheClassroomKey = "CachedClassroomInfo";
+        // 缓存专业信息
+        if (!MemoryCache.TryGetValue(cacheMajorKey, out List<MMajor> cachedMajors))
         {
             cachedMajors = MajorService.GetAllActiveMajors();
 
@@ -1937,7 +2013,9 @@
             MemoryCache.Set(cacheMajorKey, cachedMajors, cacheEntryOptions);
             _allMajors = cachedMajors;
         }
-        if (!MemoryCache.TryGetValue(cacheSemesterKey, out List<MData> cachedSemesters) || _semesters.Count == 0)
+        else{ _allMajors = cachedMajors; }
+        // 缓存学年学期信息
+        if (!MemoryCache.TryGetValue(cacheSemesterKey, out List<MData> cachedSemesters))
         {
             cachedSemesters = DictService.GetDataByName("开设学年学期");
 
@@ -1947,6 +2025,35 @@
             MemoryCache.Set(cacheSemesterKey, cachedSemesters, cacheEntryOptions);
             _semesters = cachedSemesters;
         }
+        else { _semesters = cachedSemesters; }
+        // 缓存建筑信息
+        if (!MemoryCache.TryGetValue(cacheBuildingKey, out List<MBuilding> cachedBuildings))
+        {
+            cachedBuildings = BuildingService.GetBuildings();
+            foreach(var bd in cachedBuildings)
+            {
+                bd.TreeName = bd.BuildingName;
+            }
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(59));
+
+            MemoryCache.Set(cacheBuildingKey, cachedBuildings, cacheEntryOptions);
+            _buildings = cachedBuildings;
+        }
+        else { _buildings = cachedBuildings; }
+        // 缓存教室信息
+        if (!MemoryCache.TryGetValue(cacheClassroomKey, out List<MClassroom> cachedClassrooms))
+        {
+            cachedClassrooms = ClassroomService.GetClassrooms();
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(59));
+
+            MemoryCache.Set(cacheClassroomKey, cachedClassrooms, cacheEntryOptions);
+            _classroom = cachedClassrooms;
+        }
+        else { _classroom = cachedClassrooms; }
     }
 
     /// <summary>
