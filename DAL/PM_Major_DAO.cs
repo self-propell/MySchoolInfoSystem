@@ -2,9 +2,8 @@
 using SchPeoManageWeb.Utils;
 using System.Data.SqlClient;
 using System.Data;
-using Microsoft.AspNetCore.Connections.Features;
 
-namespace SchPeoManageWeb.DAO
+namespace SchPeoManageWeb.DAL
 {
     /// <summary>
     /// 专业DAO

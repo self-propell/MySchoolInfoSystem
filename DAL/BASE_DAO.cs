@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Reflection;
 
-namespace SchPeoManageWeb.DAO
+namespace SchPeoManageWeb.DAL
 {
     /// <summary>
     /// 基础数据库转换操作

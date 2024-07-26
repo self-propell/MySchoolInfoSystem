@@ -9,7 +9,7 @@ namespace SchPeoManageWeb.Utils
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public static T AddCreateBasicInfo<T>(T model)where T : BasicModel
+        public static T AddCreateBasicInfo<T>(T model)where T : SchPeoManageWeb.Models.BasicModel
         {
             model.ReqTime= DateTime.Now;
             model.UpdateTimestamp= DateTime.Now;

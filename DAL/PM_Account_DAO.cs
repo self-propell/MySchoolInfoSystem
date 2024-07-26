@@ -6,7 +6,7 @@ using System.Reflection.PortableExecutable;
 using System.Security.Principal;
 using System.Text;
 
-namespace SchPeoManageWeb.DAO
+namespace SchPeoManageWeb.DAL
 {
     /// <summary>
     /// 账号DAO

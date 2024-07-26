@@ -1,4 +1,4 @@
-﻿using SchPeoManageWeb.DAO;
+﻿using SchPeoManageWeb.DAL;
 using SchPeoManageWeb.Models;
 
 namespace SchPeoManageWeb.Services

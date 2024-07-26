@@ -1,5 +1,4 @@
-﻿using SchPeoManageWeb.Components.Pages.UniversityAdmin;
-using SchPeoManageWeb.DAO;
+﻿using SchPeoManageWeb.DAL;
 using SchPeoManageWeb.Models;
 using SchPeoManageWeb.Utils;
 

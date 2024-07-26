@@ -1,9 +1,6 @@
-﻿using Masa.Blazor;
-using SchPeoManageWeb.DAO;
+﻿using SchPeoManageWeb.DAL;
 using SchPeoManageWeb.Models;
 using SchPeoManageWeb.Utils;
-using System.Net.NetworkInformation;
-using System.Xml.Linq;
 
 namespace SchPeoManageWeb.Services
 {

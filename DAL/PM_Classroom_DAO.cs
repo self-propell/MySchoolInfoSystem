@@ -3,7 +3,7 @@ using SchPeoManageWeb.Utils;
 using System.Data.SqlClient;
 using System.Data;
 
-namespace SchPeoManageWeb.DAO
+namespace SchPeoManageWeb.DAL
 {
     /// <summary>
     /// 教室信息DAO

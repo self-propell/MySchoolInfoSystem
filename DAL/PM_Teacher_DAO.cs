@@ -2,12 +2,8 @@
 using SchPeoManageWeb.Utils;
 using System.Data.SqlClient;
 using System.Data;
-using SchPeoManageWeb.Components.Pages.UniversityAdmin;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Masa.Blazor;
 
-namespace SchPeoManageWeb.DAO
+namespace SchPeoManageWeb.DAL
 {
     /// <summary>
     /// 教师DAO

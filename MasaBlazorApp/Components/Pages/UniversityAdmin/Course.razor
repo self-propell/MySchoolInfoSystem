@@ -10,7 +10,7 @@
 @inject IMemoryCache MemoryCache
 
 <MCard Style="padding-left:0px;">
-    <MTabs Height="45" BackgroundColor="white" Optional Style="padding-left:0;">
+    <MTabs Height="45" BackgroundColor="white" Optional Style="padding-left:0;" Grow>
         <MTab OnClick="@(() =>{page="Course";_selected=new List<MCourse>();})">
             课程信息
         </MTab>
@@ -46,45 +46,39 @@
                         })">
                 <TopContent>
                     <MSpacer></MSpacer>
-                    <MButton Elevation="3"
-                             OnClick="AddClassInfo"
-                             Color="accent"
-                             Class="mt-3 ml-3">
-                        <MIcon Left
-                               Class="mr-2"
-                               Color="white">
-                            mdi-account-plus
-                        </MIcon>
-                        添加讲台
-                    </MButton>
-                    <MButton Elevation="3"
-                             OnClick="ClassGroupDeleteForm"
-                             Color="accent"
-                             Class="ml-3 mt-3">
-                        <MIcon Left
-                               Class="mr-2"
-                               Color="white">
-                            mdi-delete
-                        </MIcon>
-                        归档
-                    </MButton>
+                    <MRow>
+                        <MCol Cols="12" Md="4" Lg="2">
+                            <MButton Elevation="3"
+                                     OnClick="AddClassInfo"
+                                     Color="accent"
+                                     Class="mt-3 ml-3">
+                                <MIcon Left
+                                       Class="mr-2"
+                                       Color="white">
+                                    mdi-account-plus
+                                </MIcon>
+                                添加讲台
+                            </MButton>
+                            <MButton Elevation="3"
+                                     OnClick="ClassGroupDeleteForm"
+                                     Color="accent"
+                                     Class="ml-3 mt-3">
+                                <MIcon Left
+                                       Class="mr-2"
+                                       Color="white">
+                                    mdi-delete
+                                </MIcon>
+                                归档
+                            </MButton>
+                        </MCol>
+                        <MCol>
+                    <MCheckbox @bind-value="_showDeletedClass" TValue="bool" OnChange="onClassSearch" Style="margin-top:12px; padding-top:3px; "><LabelContent>查看已归档讲台</LabelContent></MCheckbox>
+                </MCol>
+                </MRow>
                 </TopContent>
                 <ItemColContent>
                     @if(context.Header.Value == "States")
                     {
-@*                         @if (context.Item.EnrollmentDate == DateTime.MinValue || context.Item.EnrollmentDate > DateTime.Now)
-                        {
-                            <MChip Class="ma-2"
-                                   Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                                background-color:rgba(250,250,15,0.7);
-                                border-radius: 5px;
-                                border: 1px solid rgba(0, 0, 0, 0.1);">未开课</MChip>
-                        } *@
                         @if (context.Item.IsDeleted)
                         {
                             <MChip Class="ma-2" Disabled
@@ -97,19 +91,6 @@
                              border-radius: 5px;
                              border: 1px solid rgba(0, 0, 0, 0.1);">已归档</MChip>
                         }
-@*                         else if (context.Item.ExpiryDate <= DateTime.Today && context.Item.IsDeparted == false)
-                        {
-                            <MChip Class="ma-2"
-                                   Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                                background-color:rgba(255,0,0,0.25);
-                                border-radius: 5px;
-                                border: 1px solid rgba(0, 0, 0, 0.1);">已结课</MChip>
-                        } *@
                         else
                         {
                             <MChip Class="ma-2"
@@ -198,7 +179,7 @@
                     </MCol>
                     <MCol Cols="12"
                           Sm="6"
-                          Md="3">
+                          Md="2">
                         <MSelect Items="_allNatures"
                                  @bind-Value="searchModel.CourseNature"
                                  Clearable
@@ -211,6 +192,23 @@
                                  Label="课程性质"
                                  ItemValue="r => r.Name"
                                  ItemText="r => r.Name">
+                        </MSelect>
+                    </MCol>
+                    <MCol Cols="12"
+                          Sm="6"
+                          Md="2">
+                        <MSelect Items="_allMajors"
+                                 @bind-Value="searchModel.MajorID"
+                                 Clearable
+                                 TItem="MMajor"
+                                 TItemValue="int"
+                                 TValue="int"
+                                 Dense
+                                 HideDetails="@("auto")"
+                                 Outlined
+                                 Label="课程所属专业"
+                                 ItemValue="r => r.MajorID"
+                                 ItemText="r => r.MajorName">
                         </MSelect>
                     </MCol>
                     <MCol Cols="12"
@@ -243,6 +241,7 @@
                  SelectableKey="CourseSelectable()"
                  Class="elevation-3 mt-2"
                  OnRowClick="OnCourseRowClick"
+                 OnRowDblClick="@(()=>{page="Class"; _selectedTeachingClass=new List<MTeachingClass>();})"
                  OnItemSelect="@(r => {_selectedCourse=r.Item1;})"
                  Width="600"
                  FooterProps="@(props => {
@@ -317,6 +316,30 @@
                     </MIcon>
                 }
 
+            }
+            else if(context.Header.Value == "ClassNum")
+            {
+                if(_teachingClasses.ContainsKey(context.Item.CoursePMID))
+                {
+                    <div>@_teachingClasses[context.Item.CoursePMID].Count</div>
+                }
+                else {<div>0</div>}
+            }
+            else if(context.Header.Value == "MaxStuNum")
+            {
+                if(_teachingClasses.ContainsKey(context.Item.CoursePMID))
+                {
+                    <div>@_teachingClasses[context.Item.CoursePMID].Sum(tc => tc.MaxStuNum)</div>
+                }
+                else {<div>0</div>}
+            }
+            else if(context.Header.Value == "CurStuNum")
+            {
+                if(_teachingClasses.ContainsKey(context.Item.CoursePMID))
+                {
+                    <div>@_teachingClasses[context.Item.CoursePMID].Sum(tc => tc.CurStuNum)</div>
+                }
+                else {<div>0</div>}
             }
             else
             {
@@ -902,50 +925,25 @@
                 <div style=" color: black; text-align: center; top: -13px; width: 110px; left: 3%; position: absolute; background: white;">基本信息</div>
                 <MRow Style="margin-top:2%;">
                     <MCol Cols="12"
-                          Sm="6"
-                          Md="6">
-                        <MMenu OpenOnHover OffsetY>
-                            <ActivatorContent>
-                                <MButton @attributes="@context.Attrs">名称列表</MButton>
-                            </ActivatorContent>
-                            <ChildContent>
-                                <MList>
-                                    @foreach (var item in _selected.ToList())
-                                    {
-                                        <MListItem>
-                                            <MListItemContent>
-                                                <MListItemTitle>
-                                                    @item.CourseName
-                                                </MListItemTitle>
-                                            </MListItemContent>
-                                        </MListItem>
-                                    }
-                                </MList>
-                            </ChildContent>
-                        </MMenu>
-                    </MCol>
-                    <MCol Cols="12"
-                          Sm="6"
-                          Md="6">
-                        <MMenu OpenOnHover OffsetY>
-                            <ActivatorContent>
-                                <MButton @attributes="@context.Attrs">课程号列表</MButton>
-                            </ActivatorContent>
-                            <ChildContent>
-                                <MList>
-                                    @foreach (var item in _selected.ToList())
-                                    {
-                                        <MListItem>
-                                            <MListItemContent>
-                                                <MListItemTitle>
-                                                    @item.CoursePMID
-                                                </MListItemTitle>
-                                            </MListItemContent>
-                                        </MListItem>
-                                    }
-                                </MList>
-                            </ChildContent>
-                        </MMenu>
+                          Sm="12"
+                          Md="12">
+                        <MSimpleTable FixedHeader Height="180" Style="border:solid 1px;border-color:rgba(250,250,250,0.3);">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">课程号列表</th>
+                                    <th class="text-center">名称列表</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in _selected.ToList())
+                                {
+                                    <tr>
+                                        <td class="text-center">@item.CoursePMID</td>
+                                        <td class="text-center">@item.CourseName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </MSimpleTable>
                     </MCol>
                 </MRow>
             </MContainer>
@@ -1665,8 +1663,7 @@
                 <MRow Style="margin-top:3;">
                     <MCol Cols="12"
                           Sm="6"
-                          Md="6"
-                          Style="margin-top:4%;">
+                          Md="6">
                         <MTextField Label="课程编号"
                                     TValue="string"
                                     Dense
@@ -1810,42 +1807,27 @@
                     <MCol Cols="12"
                           Sm="6"
                           Md="12">
-                        <MMenu OpenOnHover OffsetY>
-                            <ActivatorContent>
-                                <MButton @attributes="@context.Attrs">班级号-教师列表</MButton>
-                            </ActivatorContent>
-                            <ChildContent>
-                                <MList>
-                                    <MRow>
-                                        <MCol>
-                                            @foreach (var item in _selectedTeachingClass.ToList())
-                                            {
-                                                <MListItem>
-                                                    <MListItemContent>
-                                                        <MListItemTitle>
-                                                            @item.ClassPMID
-                                                        </MListItemTitle>
-                                                    </MListItemContent>
-                                                </MListItem>
-                                            }
-                                        </MCol>
-                                        <MCol>
-                                            @foreach (var item in _selectedTeachingClass.ToList())
-                                            {
-                                                <MListItem>
-                                                    <MListItemContent>
-                                                        <MListItemTitle>
-                                                            @item.TeacherName
-                                                        </MListItemTitle>
-                                                    </MListItemContent>
-                                                </MListItem>
-                                            }
-                                        </MCol>
-                                    </MRow>
-                                   
-                                </MList>
-                            </ChildContent>
-                        </MMenu>
+                          <MSimpleTable FixedHeader Height="180" Style="border:solid 1px;border-color:rgba(250,250,250,0.3);">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        讲台编号
+                                    </th>
+                                    <th class="text-center">
+                                        教师姓名
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in _selectedTeachingClass.ToList())
+                                {
+                                    <tr>
+                                    <td class="text-center">@item.ClassPMID</td>
+                                        <td class="text-center">@item.TeacherName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                          </MSimpleTable>
                     </MCol>
                 </MRow>
             </MContainer>
@@ -1929,6 +1911,14 @@
     private List<MMajor> _allMajors = new List<MMajor>();
     private List<MData> _semesters = new List<MData>();
     private Dictionary<string, List<MTeachingClass>> _teachingClasses = new Dictionary<string, List<MTeachingClass>>();
+    /// <summary>
+    /// 存储单个课程的所有讲台
+    /// </summary>
+    private List<MTeachingClass> _courseTeachingClass = new List<MTeachingClass>();
+
+    /// <summary>
+    /// 存储课程显示的讲台
+    /// </summary>
     private List<MTeachingClass> _showTeachingClass = new List<MTeachingClass>();
     private List<MClassroom> _classroom = new List<MClassroom>();
     private List<MBuilding> _buildings = new List<MBuilding>();
@@ -2162,7 +2152,7 @@
         {
             if (item.Key.Equals(_selectedCourse.CoursePMID))
             {
-                _showTeachingClass = item.Value;
+                _courseTeachingClass = item.Value;
             }
         }
         StateHasChanged();
@@ -2170,7 +2160,7 @@
     }
 
     /// <summary>
-    /// 课程信息表格
+    /// 课程信息列表
     /// </summary>
     private IEnumerable<MCourse> _selected = new List<MCourse>();
 
@@ -2179,7 +2169,7 @@
     /// </summary>
     private List<DataTableHeader<MCourse>> _headers => new List<DataTableHeader<MCourse>>
     {
-    new()
+        new()
         {
             Text = "课程号",
             Align = DataTableHeaderAlign.Center,
@@ -2187,7 +2177,14 @@
             // Value =_headers.FindIndex(header => header.Value == nameof(MTeacher.TeacherId)),
             Value = nameof(MCourse.CoursePMID),
             Ellipsis = new DataTableEllipsis(),
-            Width = 80
+            Width = 100
+        },
+     new() {
+            Text = "开设学期",
+            Value = nameof(MCourse.OpenSemester),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=80
         },
         new() {
             Text = "课程名",
@@ -2196,41 +2193,57 @@
             Class="text-no-wrap",
             Sortable=false,
             Ellipsis = new DataTableEllipsis(),
-            Width=150
-        },
-        new() {
-            Text = "开设学期",
-            Value = nameof(MCourse.OpenSemester),
-            Align=DataTableHeaderAlign.Center,
-            Sortable=false,
-            Width=100
-        },
-        new() { Text = "课时",
-            Value = nameof(MCourse.ClassHour),
-            Align=DataTableHeaderAlign.Center,
-            Ellipsis = new DataTableEllipsis(),
-            Sortable=false,
-            Width=60,
-        },
-        new() { Text = "课程性质",
-            Value = nameof(MCourse.CourseNature),
-            Align=DataTableHeaderAlign.Center,
-            Sortable=false,
-            Width=100
+            Width=180
         },
         new() { Text = "所属专业",
             Value = nameof(MCourse.MajorName),
             Align=DataTableHeaderAlign.Center,
             Ellipsis = new DataTableEllipsis(),
             Sortable=false,
-            Width=90,
+            Width=120,
+        },
+        new() { Text = "课程性质",
+            Value = nameof(MCourse.CourseNature),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=80
+        },
+        new() { Text = "课时",
+            Value = nameof(MCourse.ClassHour),
+            Align=DataTableHeaderAlign.Center,
+            Ellipsis = new DataTableEllipsis(),
+            Sortable=false,
+            Width=80,
+        },        
+        new() { Text = "讲台数量",
+            Value = "ClassNum",
+            Align=DataTableHeaderAlign.Center,
+            Ellipsis = new DataTableEllipsis(),
+            Sortable=false,
+            Width=80,
+        },
+        new() {
+            Text = "总限选人数",
+            Value = "MaxStuNum",
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Width=80
+        },
+        new() {
+            Text = "总选课人数",
+            Value = "CurStuNum",
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Width=80
         },
         new() {
             Text = "操作",
             Value = "Actions",
             Sortable = false,
             Align=DataTableHeaderAlign.Center,
-            Width = 90
+            Width = 110
         }
     };
 
@@ -2460,7 +2473,10 @@
         public string? SearchInfo { get; set; }
 
         public string CourseNature { get; set; }
+
         public bool Deleted{ get; set; }
+
+        public int MajorID{ get; set; }
     }
     SearchModel searchModel = new SearchModel();
 
@@ -2468,7 +2484,7 @@
     private void onSearch()
     {
         showCourses.Clear();
-        if (string.IsNullOrEmpty(searchModel.SearchInfo) && string.IsNullOrEmpty(searchModel.CourseNature)&& (searchModel.Deleted==true))
+        if (string.IsNullOrEmpty(searchModel.SearchInfo) && string.IsNullOrEmpty(searchModel.CourseNature)&& (searchModel.Deleted==true) && (searchModel.MajorID==0))
         {
             showCourses.AddRange(_courseInfo);
         }
@@ -2483,6 +2499,7 @@
                 )
                 && (string.IsNullOrEmpty(searchModel.CourseNature) || tec.CourseNature.Equals(searchModel.CourseNature))
                 && ((searchModel.Deleted == true)||(tec.IsDeleted==false))
+                && (searchModel.MajorID==0 || tec.MajorID==searchModel.MajorID)
                 )
                 {
                     showCourses.Add(tec);
@@ -2490,6 +2507,26 @@
             }
         }
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// 是否查询已归档的讲台
+    /// </summary>
+    private bool _showDeletedClass =false;
+    /// <summary>
+    /// 查询讲台的函数
+    /// </summary>
+    private void onClassSearch()
+    {
+        _showTeachingClass.Clear();
+        if(_showDeletedClass==true)_showTeachingClass.AddRange( _courseTeachingClass);
+        else
+        {
+            foreach(var item in _courseTeachingClass)
+            {
+                if (item.IsDeleted == false) _showTeachingClass.Add(item);
+            }
+        }
     }
 
     /*-------------------------------------------------------------------讲台---------------------------------------------------------------*/
@@ -2603,13 +2640,18 @@
     private void OnCourseRowClick(DataTableRowMouseEventArgs<MCourse> cour)
     {
         _selectedCourse = cour.Item;
-        _showTeachingClass = new List<MTeachingClass>();
+        _courseTeachingClass = new List<MTeachingClass>();
         _selectedTeachingClass = new List<MTeachingClass>();
         foreach(var item in _teachingClasses)
         {
             if(item.Key.Equals(_selectedCourse.CoursePMID))
             {
-                _showTeachingClass=item.Value;
+                _courseTeachingClass=item.Value;
+                _showTeachingClass.Clear();
+                foreach(var cls in _courseTeachingClass)
+                {
+                    if (cls.IsDeleted == false) _showTeachingClass.Add(cls);
+                }
             }
         }
     }

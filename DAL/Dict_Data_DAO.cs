@@ -2,9 +2,8 @@
 using SchPeoManageWeb.Utils;
 using System.Data.SqlClient;
 using System.Data;
-using Masa.Blazor;
 
-namespace SchPeoManageWeb.DAO
+namespace SchPeoManageWeb.DAL
 {
     /// <summary>
     /// 数据字典DAO

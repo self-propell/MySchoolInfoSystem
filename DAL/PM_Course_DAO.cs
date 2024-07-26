@@ -1,10 +1,9 @@
-﻿using SchPeoManageWeb.Components.Pages.UniversityAdmin;
-using SchPeoManageWeb.Models;
+﻿using SchPeoManageWeb.Models;
 using SchPeoManageWeb.Utils;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace SchPeoManageWeb.DAO
+namespace SchPeoManageWeb.DAL
 {
     /// <summary>
     /// 课程DAO
