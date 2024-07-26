@@ -29,8 +29,6 @@
     </MTabs>
 </MCard>
 
-
-
 <!--讲台信息-->
 @if(page=="Class")
 {
@@ -373,7 +371,7 @@
                                                 @bind-Value="mCourse.CoursePMID"
                                                 TValue="string"
                                                 Autofocus
-                                                Rules="_pmidRules"
+                                                Rules="Command.CoursePMIDRule"
                                                 HideDetails="@("auto")"
                                                 Dense
                                                 Outlined>
@@ -386,7 +384,7 @@
                                                 Type="string"
                                                 @bind-Value="mCourse.CourseName"
                                                 TValue="string"
-                                                Rules="_courseNameRules"
+                                                Rules="Command.CourseNameRule"
                                                 HideDetails="@("auto")"
                                                 Dense
                                                 Outlined>
@@ -413,7 +411,7 @@
                                                 TValue="int"
                                                 RequiredMessage="请输入课时"
                                                 Required
-                                                Rules="_classHourRules"
+                                                Rules="Command.ClassHourRule"
                                                 HideDetails="@("auto")"
                                                 Dense
                                                 Outlined>
@@ -663,7 +661,7 @@
                                         @bind-Value="mCourse.CoursePMID"
                                         TValue="string"
                                         Autofocus
-                                        Rules="_pmidRules"
+                                        Rules="Command.CoursePMIDRule"
                                         HideDetails="@("auto")"
                                         Dense
                                         Outlined>
@@ -676,7 +674,7 @@
                                         Type="string"
                                         @bind-Value="mCourse.CourseName"
                                         TValue="string"
-                                        Rules="_courseNameRules"
+                                        Rules="Command.CourseNameRule"
                                         HideDetails="@("auto")"
                                         Dense
                                         Outlined>
@@ -703,7 +701,7 @@
                                         TValue="int"
                                         RequiredMessage="请输入课时"
                                         Required
-                                        Rules="_classHourRules"
+                                        Rules="Command.ClassHourRule"
                                         HideDetails="@("auto")"
                                         Dense
                                         Outlined>
@@ -1132,7 +1130,7 @@
                                                 Label="限选人数"
                                                 @bind-Value=mTeachingClass.MaxStuNum
                                                 TValue="int"
-                                                Rules="_maxStuNumRules"
+                                                Rules="Command.MaxStuNumRule"
                                                 Outlined
                                                 Dense
                                                 HideDetails="@("auto")">
@@ -1360,7 +1358,7 @@
                                         Label="限选人数"
                                         @bind-Value=mTeachingClass.MaxStuNum
                                         TValue="int"
-                                        Rules="_maxStuNumRules"
+                                        Rules="Command.MaxStuNumRule"
                                         Outlined
                                         Readonly
                                         Dense
@@ -1549,7 +1547,7 @@
                                                 Label="限选人数"
                                                 @bind-Value=mTeachingClass.MaxStuNum
                                                 TValue="int"
-                                                Rules="_maxStuNumRules"
+                                                Rules="Command.MaxStuNumRule"
                                                 Outlined
                                                 Dense
                                                 HideDetails="@("auto")">
@@ -1913,7 +1911,6 @@
 </MDialog>
 
 
-
 @code {
     /*-------------------------------------------------------------启动------------------------------------------------------------------*/
     // 页面选择
@@ -2084,19 +2081,19 @@
     /// <returns></returns>
     private Dictionary<string,List<MTeachingClass>> LoadClassInfoFromCacheAsync()
     {
-        const string cacheItemKey = "CachedClassInfo";
+        const string cacheItemKey = "CachedClassGroupByCourseInfo";
 
-        if (!MemoryCache.TryGetValue(cacheItemKey, out Dictionary<string, List<MTeachingClass>> cachedClassInfo) || cachedClassInfo.Count == 0)
+        if (!MemoryCache.TryGetValue(cacheItemKey, out Dictionary<string, List<MTeachingClass>> cachedClassGroupByCourseInfo) || cachedClassGroupByCourseInfo.Count == 0)
         {
-            cachedClassInfo = TeachingClassService.GetAllTeachingClassGroupByCourse();
+            cachedClassGroupByCourseInfo = TeachingClassService.GetAllTeachingClassGroupByCourse();
 
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetSlidingExpiration(TimeSpan.FromSeconds(23));
 
-            MemoryCache.Set(cacheItemKey, cachedClassInfo, cacheEntryOptions);
+            MemoryCache.Set(cacheItemKey, cachedClassGroupByCourseInfo, cacheEntryOptions);
         }
-        _teachingClasses = cachedClassInfo;
-        return cachedClassInfo;
+        _teachingClasses = cachedClassGroupByCourseInfo;
+        return cachedClassGroupByCourseInfo;
     }
 
     /// <summary>
@@ -2160,7 +2157,7 @@
         // 更新缓存
         var cacheEntryOptions = new MemoryCacheEntryOptions()
             .SetSlidingExpiration(TimeSpan.FromSeconds(23));
-        MemoryCache.Set("CachedClassInfo", _teachingClasses, cacheEntryOptions);
+        MemoryCache.Set("CachedClassGroupByCourseInfo", _teachingClasses, cacheEntryOptions);
         foreach (var item in _teachingClasses)
         {
             if (item.Key.Equals(_selectedCourse.CoursePMID))
@@ -2779,38 +2776,4 @@
         mTeachingClass = teachingClass;
         _readClassC = true;
     }
-
-
-
-    /*-----------------------------------------------------------------输入规则列表---------------------------------------------------------------*/
-
-    // 课程编号
-    private static string _pmidPattern = @"^C\d{5,11}$";
-    private static Regex _pmidRegex = new Regex(_pmidPattern);
-    private IEnumerable<Func<string, StringBoolean>> _pmidRules = new List<Func<string, StringBoolean>>
-        {
-            value => (!string.IsNullOrEmpty(value) && _pmidRegex.IsMatch(value)) ? true: "请输入正确格式课程编号"
-
-        };
-
-    // 课程名
-    private static string _courseNamePattern = @"^[\u4e00-\u9fa5A-Za-z0-9\s_\-]+$";
-    private static Regex _courseNameRegex = new Regex(_courseNamePattern);
-    private IEnumerable<Func<string, StringBoolean>> _courseNameRules = new List<Func<string, StringBoolean>>
-    {
-        value => (!string.IsNullOrEmpty(value) && _courseNameRegex.IsMatch(value)) ? true: "请输入正确格式课程名"
-    };
-
-    // 课时
-    private IEnumerable<Func<int, StringBoolean>> _classHourRules = new List<Func<int, StringBoolean>>
-    {
-        value => value >= 1 && value <= 96 ? true : "课时超出限制范围【1-96】"
-    };
-
-    // 选课人数
-    private IEnumerable<Func<int, StringBoolean>> _maxStuNumRules = new List<Func<int, StringBoolean>>
-    {
-        value => value >= 1 && value <= 3000 ? true : "超出限制范围【1-3000】"
-    };
-
 }

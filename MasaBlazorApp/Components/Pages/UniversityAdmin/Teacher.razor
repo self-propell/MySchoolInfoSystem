@@ -31,7 +31,7 @@
 </MCard>
 
 <!--教师信息子页面-->
-@if(page.Equals("Teacher"))
+@if (page.Equals("Teacher"))
 {
     <!--信息搜索框-->
     <MCard Class="mt-3">
@@ -93,18 +93,18 @@
 
     <!--教师信息表格主体-->
     ﻿<MDataTable Headers="_headers"
-                 Items="@showTeachers"
-                 @bind-Value="_selected"
-                 TItem="MTeacher"
-                 ItemKey="r => r.TeacherId.ToString()"
-                 ItemsPerPage="10"
-                 ShowSelect
-                 SelectableKey="TeacherSelectable()"
-                 Class="elevation-3 mt-5"
-                 OnRowClick="OnTeacherRowClick"
-                 OnItemSelect="@(r => {_selectedTeacher=r.Item1;})"
-                 ResizeMode="_resizeMode"
-                 FooterProps="@(props => {
+                     Items="@showTeachers"
+                     @bind-Value="_selected"
+                     TItem="MTeacher"
+                     ItemKey="r => r.TeacherId.ToString()"
+                     ItemsPerPage="10"
+                     ShowSelect
+                     SelectableKey="TeacherSelectable()"
+                     Class="elevation-3 mt-5"
+                     OnRowClick="OnTeacherRowClick"
+                     OnItemSelect="@(r => {_selectedTeacher=r.Item1;})"
+                     ResizeMode="_resizeMode"
+                     FooterProps="@(props => {
                             props.PageText="第 "+(props.Pagination.PageStart+1).ToString()+" 项-第 "+(props.Pagination.PageStop).ToString()+" 项"+"   共"+(props.Pagination.ItemsLength)+"项";
 })">
         <TopContent>
@@ -294,130 +294,51 @@
         </ItemColContent>
     </MDataTable>
 }
-
 <!--教师执教的讲台信息子页面-->
-@* else
+@if(page.Equals("Class"))
 {
-    <MCard Class="mt-3">
-        <MCardTitle Style="padding-bottom:0;">@_selectedTeacher.Name 的讲台列表</MCardTitle>
-        <MCardText Style="padding-left:0px;">
-            <MDataTable ShowSelect
-                        @bind-Value="_selectedTeachingClass"
-                        ItemKey="r => r.ClassPMID"
-                        Headers="_classHeader"
-                        Items="_showTeachingClass"
-                        SelectableKey="ClassSelectable()"
-                        FooterProps="@(props => {
+<MCard Class="mt-3">
+    <MCardTitle Style="padding-bottom:0;">@_selectedTeacher.Name 的讲台列表</MCardTitle>
+    <MCardText Style="padding-left:0px;">
+        <MDataTable ShowSelect
+                    @bind-Value="_selectedTeachingClass"
+                    ItemKey="r => r.ClassPMID"
+                    Headers="_classHeader"
+                    Items="_showTeachingClass"
+                    SelectableKey="ClassSelectable()"
+                    FooterProps="@(props => {
                         props.PageText="第 "+(props.Pagination.PageStart+1).ToString()+" 项-第 "+(props.Pagination.PageStop).ToString()+" 项"+"   共"+(props.Pagination.ItemsLength)+"项";
                         })">
-                <TopContent>
-                    <MSpacer></MSpacer>
-                    <MButton Elevation="3"
-                             Disabled
-                             Color="accent"
-                             Class="mt-3 ml-3">
-                        <MIcon Left
-                               Class="mr-2"
-                               Color="white">
-                            mdi-account-plus
-                        </MIcon>
-                        添加讲台
-                    </MButton>
-                    <MButton Elevation="3"
-                             OnClick="ClassGroupDeleteForm"
-                             Color="accent"
-                             Class="ml-3 mt-3">
-                        <MIcon Left
-                               Class="mr-2"
-                               Color="white">
-                            mdi-delete
-                        </MIcon>
-                        归档
-                    </MButton>
-                </TopContent>
-                <ItemColContent>
-                    @if(context.Header.Value == "States")
-                    {
-                        @if (context.Item.IsDeleted)
-                        {
-                            <MChip Class="ma-2" Disabled
-                                   Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                             border-radius: 5px;
-                             border: 1px solid rgba(0, 0, 0, 0.1);">已归档</MChip>
-                        }
-                        else
-                        {
-                            <MChip Class="ma-2"
-                                   Style="width:70px;
-                                padding:5px;
-                                align-content:center;
-                                justify-content:center;
-                                align-items:center;
-                                text-align:center;
-                             background-color:rgba(0,255,0,0.25);
-                             border-radius: 5px;
-                             border: 1px solid rgba(0, 0, 0, 0.1);">正常 </MChip>
-                        }
-                    }
-                    @if (context.Header.Value == "Actions")
-                    {
-                        <MIcon Style="margin-right:3px;"
-                               title="查看"
-                               Color="accent"
-                               OnClick="() => ReadClassForm(context.Item)"
-                               Icon="@("mdi-file")">
-                        </MIcon>
-                        @if (context.Item.IsDeleted == false)
-                        {
-                            <MIcon Style="margin-right:3px;"
-                                   title="编辑"
-                                   Color="accent"
-                                   OnClick="() => EditClassForm(context.Item)"
-                                   Icon="@("mdi-pencil")">
-                            </MIcon>
-                        }
-                        else
-                        {
-                            <MIcon Style="margin-right:3px;"
-                                   title="编辑"
-                                   Color="accent"
-                                   Disabled
-                                   Icon="@("mdi-pencil")">
-                            </MIcon>
-                        }
-                        @if (context.Item.IsDeleted == false)
-                        {
-                            <MIcon title="归档"
-                                   Color="accent"
-                                   OnClick="() => DeleteClassForm(context.Item)"
-                                   Icon="@(" mdi-delete")">
-                            </MIcon>
-                        }
-                        else
-                        {
-                            <MIcon title="归档"
-                                   Color="accent"
-                                   Disabled
-                                   Icon="@(" mdi-delete")">
-                            </MIcon>
-                        }
+            <TopContent>
+                <MSpacer></MSpacer>
+                <MButton Elevation="3"
+                         Disabled
+                         Color="accent"
+                         Class="mt-3 ml-3">
+                    <MIcon Left
+                           Class="mr-2"
+                           Color="white">
+                        mdi-account-plus
+                    </MIcon>
+                    添加讲台
+                </MButton>
+                <MButton Elevation="3"
+                         Disabled
+                         Color="accent"
+                         Class="ml-3 mt-3">
+                    <MIcon Left
+                           Class="mr-2"
+                           Color="white">
+                        mdi-delete
+                    </MIcon>
+                    归档
+                </MButton>
+            </TopContent>
+        </MDataTable>
+    </MCardText>
+</MCard>
+}
 
-                    }
-                    else
-                    {
-                        @context.Value
-                    }
-                </ItemColContent>
-            </MDataTable>
-        </MCardText>
-    </MCard>
-} 
-*@
 
 <!--添加教师信息按钮呼出的表单-->
 <MRow Justify="JustifyTypes.Center">
@@ -443,7 +364,8 @@
                                                 @bind-Value="mTeacher.Name"
                                                 TValue="string"
                                                 Autofocus
-                                                Rules="_nameRules"
+                                                Required
+                                                RequiredMessage="请输入教师姓名"
                                                 HideDetails="@("auto")"
                                                 Dense
                                                 Outlined>
@@ -453,7 +375,7 @@
                                       Sm="6"
                                       Md="3">
                                     <MSelect @bind-Value="mTeacher.Sex"
-                                             Items="_genders"
+                                             Items="@(Enum.GetNames(typeof(Sexs)).Select(name => name).ToList())"
                                              ItemText="r => r" ItemValue="r => r"
                                              Label="性别*"
                                              SingleLine
@@ -471,7 +393,7 @@
                                                 Type="number"
                                                 @bind-Value="mTeacher.PhoneNumber"
                                                 TValue="string"
-                                                Rules="_phoneRules"
+                                                Rules="Command.PhoneRule"
                                                 NumberProps="@(prop => { prop.HideControl = true; })"
                                                 HideDetails="@("auto")"
                                                 Dense
@@ -486,7 +408,7 @@
                                                 TValue="string"
                                                 RequiredMessage="请输入身份证号"
                                                 Required
-                                                Rules="_idRules"
+                                                Rules="Command.IDRule"
                                                 HideDetails="@("auto")"
                                                 Dense
                                                 Outlined>
@@ -498,7 +420,7 @@
                                     <MTextField Label="联系邮箱"
                                                 @bind-Value="mTeacher.Email"
                                                 TValue="string"
-                                                Rules="_mailRules"
+                                                Rules="Command.MailRule"
                                                 PersistentHint
                                                 HideDetails="@("auto")"
                                                 Dense
@@ -517,7 +439,7 @@
                                                 @bind-Value="mTeacher.EmployeeID"
                                                 TValue="string"
                                                 ValidateOnBlur
-                                                Rules="_empIDRules"
+                                                Rules="Command.EmpIDRule"
                                                 NumberProps="@(prop => { prop.HideControl = true; })"
                                                 HideDetails="@("auto")"
                                                 Dense
@@ -592,7 +514,7 @@
                                       Sm="6"
                                       Md="3">
                                     <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
-                                             Items="_budget"
+                                             Items="@(Enum.GetNames(typeof(YesNo)).Select(name => name).ToList())"
                                              ItemText="r => r.ToString()"
                                              ItemValue="r => r.Equals(yes)?true:false"
                                              Label="是否有编制*"
@@ -759,7 +681,7 @@
                               Sm="6"
                               Md="3">
                             <MSelect @bind-Value="mTeacher.Sex"
-                                     Items="_genders"
+                                     Items="@(Enum.GetNames(typeof(Sexs)).Select(name => name).ToList())"
                                      ItemText="r => r" ItemValue="r => r"
                                      Label="性别*"
                                      Readonly
@@ -883,7 +805,7 @@
                               Sm="6"
                               Md="3">
                             <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
-                                     Items="_budget"
+                                     Items="@(Enum.GetNames(typeof(YesNo)).Select(name => name).ToList())"
                                      ItemText="r => r.ToString()"
                                      ItemValue="r => r.Equals(yes)?true:false"
                                      Label="是否有编制*"
@@ -984,7 +906,8 @@
                                         @bind-Value="mTeacher.Name"
                                         TValue="string"
                                         Autofocus
-                                        Rules="_nameRules"
+                                        Required
+                                        RequiredMessage="请输入教师姓名"
                                         HideDetails="@("auto")"
                                         Dense
                                         Outlined>
@@ -994,7 +917,7 @@
                               Sm="6"
                               Md="3">
                             <MSelect @bind-Value="mTeacher.Sex"
-                                     Items="_genders"
+                                     Items="@(Enum.GetNames(typeof(Sexs)).Select(name => name).ToList())"
                                      ItemText="r => r" ItemValue="r => r"
                                      Label="性别*"
                                      SingleLine
@@ -1012,7 +935,7 @@
                                         Type="number"
                                         @bind-Value="mTeacher.PhoneNumber"
                                         TValue="string"
-                                        Rules="_phoneRules"
+                                        Rules="Command.PhoneRule"
                                         NumberProps="@(prop => { prop.HideControl = true; })"
                                         HideDetails="@("auto")"
                                         Dense
@@ -1027,7 +950,7 @@
                                         TValue="string"
                                         RequiredMessage="请输入身份证号"
                                         Required
-                                        Rules="_idRules"
+                                        Rules="Command.IDRule"
                                         HideDetails="@("auto")"
                                         Dense
                                         Outlined>
@@ -1039,7 +962,7 @@
                             <MTextField Label="联系邮箱"
                                         @bind-Value="mTeacher.Email"
                                         TValue="string"
-                                        Rules="_mailRules"
+                                        Rules="Command.MailRule"
                                         PersistentHint
                                         HideDetails="@("auto")"
                                         Dense
@@ -1057,7 +980,7 @@
                             <MTextField Label="教职工号*"
                                         @bind-Value="mTeacher.EmployeeID"
                                         TValue="string"
-                                        Rules="_empIDRules"
+                                        Rules="Command.EmpIDRule"
                                         NumberProps="@(prop => { prop.HideControl = true; })"
                                         HideDetails="@("auto")"
                                         Dense
@@ -1130,7 +1053,7 @@
                               Sm="6"
                               Md="3">
                             <MSelect @bind-Value="mTeacher.IsBudgetedPosts"
-                                     Items="_budget"
+                                     Items="@(Enum.GetNames(typeof(YesNo)).Select(name => name).ToList())"
                                      ItemText="r => r.ToString()"
                                      ItemValue="r => r.Equals(yes)?true:false"
                                      Label="是否有编制*"
@@ -1603,7 +1526,7 @@
     </MCard>
 </MDialog>
 
-<!--归档用选框-->    
+<!--归档用选框-->
 <MDialog @bind-Value="_deleteTeacherC" MaxWidth="500">
     <MCard>
         <MCardTitle Class="text-h5">你确定要归档该条教师信息：@mTeacher.Name ?</MCardTitle>
@@ -1937,7 +1860,7 @@
     /// <summary>
     /// 课程页面用选取
     /// </summary>
-    private MTeacher _selectedTeacher= null;
+    private MTeacher _selectedTeacher = null;
 
     /// <summary>
     /// 所有教师信息
@@ -1963,6 +1886,11 @@
     /// 展示的教学班信息
     /// </summary>
     private List<MTeachingClass> _showTeachingClass = new List<MTeachingClass>();
+
+    /// <summary>
+    /// 职称
+    /// </summary>
+    public static List<MData> _jobTitleItems = DictService.GetJobTitles();
     /*------------------------------------启动------------------------------------*/
 
     /// <summary>
@@ -2019,7 +1947,7 @@
     /// <returns></returns>
     private Dictionary<string, List<MTeachingClass>> LoadClassInfoFromCacheAsync()
     {
-        const string cacheItemKey = "CachedClassInfo";
+        const string cacheItemKey = "CachedClassGroupByTeacherInfo";
 
         if (!MemoryCache.TryGetValue(cacheItemKey, out Dictionary<string, List<MTeachingClass>> cachedClassInfo) || cachedClassInfo.Count == 0)
         {
@@ -2180,7 +2108,7 @@
         {
             if (item.Key.Equals(_selectedTeacher.EmployeeID))
             {
-                _showTeachingClass=item.Value;
+                _showTeachingClass = item.Value;
             }
         }
     }
@@ -2356,7 +2284,6 @@
     /// </summary>
     private void GroupDeleteTeacherForm()
     {
-
         if (_selected.Count() == 0)
         {
             _errorMessage = "请至少选择一名教师！";
@@ -2380,7 +2307,6 @@
     {
         if (string.IsNullOrEmpty(_deleteReason))
         {
-
             _errorMessage = "请输入归档原因！";
             _errorVisiable = true;
             return;
@@ -2584,11 +2510,9 @@
     }
     /*--------------------------------------------搜索框---------------------------------------------*/
 
-
     class SearchModel
     {
         public string? SearchInfo { get; set; }
-
 
         public int SchoolLimit { get; set; }
 
@@ -2633,64 +2557,106 @@
         StateHasChanged();
     }
 
-    /*------------------------------------------表单输入限制-----------------------------------------*/
+    /*-------------------------------------------------------------------讲台---------------------------------------------------------------*/
+    // 讲台信息表格
+    private MTeachingClass mTeachingClass = new MTeachingClass();
 
-    // 姓名
-    private IEnumerable<Func<string, StringBoolean>> _nameRules = new List<Func<string, StringBoolean>>
-        {
-            value => (!string.IsNullOrEmpty(value)) ? true: "请输入姓名"
-
-        };
-
-    // 性别选单性别列表
-    private List<string> _genders = new List<string>
+    /*------------------------------查看讲台列表---------------------------------*/
+    /// <summary>
+    /// 讲台是否可选择的条件判断
+    /// </summary>
+    /// <returns></returns>
+    private Func<MTeachingClass, bool> ClassSelectable()
     {
-        "男",
-        "女"
-    };
-
-    // 联系邮箱
-    static string _mailPattern = @"(^$)|(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$){1,255}";
-    static Regex _mailRegex = new Regex(_mailPattern);
-    private IEnumerable<Func<string, StringBoolean>> _mailRules = new List<Func<string, StringBoolean>>
+        return course =>
         {
-            value => (string.IsNullOrEmpty(value)|| _mailRegex.IsMatch(value)) ? true: "请输入正确的联系邮箱"
-
+            return !course.IsDeleted;
         };
-
-    //联系电话
-    static string _phonePattern = @"(^$)|(^1[3-9]\d{9}$)";
-    static Regex _phoneRegex = new Regex(_phonePattern);
-    private IEnumerable<Func<string, StringBoolean>> _phoneRules = new List<Func<string, StringBoolean>>
-        {
-            value => (string.IsNullOrEmpty(value) || _phoneRegex.IsMatch(value)) ? true: "请输入正确的联系电话"
-
-        };
-
-    // 身份证
-    static string _idPattern = @"^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$";
-    static Regex _idRegex = new Regex(_idPattern);
-    private IEnumerable<Func<string, StringBoolean>> _idRules = new List<Func<string, StringBoolean>>
-        {
-            value => (!string.IsNullOrEmpty(value) && _idRegex.IsMatch(value)) ? true: "请输入正确的身份证号"
-        };
-
-    // 职称
-    private List<MData> _jobTitleItems = DictService.GetJobTitles();
-
-    // 编制
-    private List<string> _budget = new List<string>
+    }
+    private MCourse _selectedCourse = null;
+    private List<DataTableHeader<MTeachingClass>> _classHeader => new List<DataTableHeader<MTeachingClass>>
     {
-        "是",
-        "否"
-    };
-
-    // 教职工号
-    static string _empIDPattern = @"^T\d{5,11}$";
-    static Regex _empIDRegex = new Regex(_empIDPattern);
-    private IEnumerable<Func<string, StringBoolean>> _empIDRules = new List<Func<string, StringBoolean>>
+    new()
         {
-            value => (!string.IsNullOrEmpty(value) && _empIDRegex.IsMatch(value)) ? true: "请输入正确的教职工号"
-
-        };
+            Text = "课程号",
+            Align = DataTableHeaderAlign.Center,
+            Sortable = true,
+            Value = nameof(MTeachingClass.CourseID),
+            Ellipsis = new DataTableEllipsis(),
+            Width = 80
+        },
+        new() {
+            Text = "课程名",
+            Value = nameof(MTeachingClass.CourseName),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=150
+        },
+        new() {
+            Text = "班级编号",
+            Value = nameof(MTeachingClass.ClassPMID),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=100
+        },
+        new() { Text = "主讲教师",
+            Value = nameof(MTeachingClass.TeacherName),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Width=150
+        },
+        new() {
+            Text = "限选人数",
+            Value = nameof(MTeachingClass.MaxStuNum),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Width=80
+        },
+        new() {
+            Text = "选课人数",
+            Value = nameof(MTeachingClass.CurStuNum),
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Width=80
+        },
+        new() {
+            Text = "上课地点",
+            Value = nameof(MTeachingClass.Location),
+            Align=DataTableHeaderAlign.Center,
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=150
+        },
+        new() {
+            Text = "上课时间",
+            Value = "ClassTime",
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=200
+        },
+        new() {
+            Text = "状态",
+            Value = "States",
+            Align=DataTableHeaderAlign.Center,
+            Class="text-no-wrap",
+            Sortable=false,
+            Ellipsis = new DataTableEllipsis(),
+            Width=90
+        },
+        new() {
+            Text = "操作",
+            Value = "Actions",
+            Sortable = false,
+            Align=DataTableHeaderAlign.Center,
+            Width = 90
+        }
+    };
 }
