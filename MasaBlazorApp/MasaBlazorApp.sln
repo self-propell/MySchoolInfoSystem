@@ -7,13 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchPeoManageWeb", "SchPeoMa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchPeoManageWebTests", "..\SchPeoManageWebTests\SchPeoManageWebTests.csproj", "{16BC8D99-E31F-4201-85D3-5BC2856DCC0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "..\Models\Models.csproj", "{794855A4-0D45-4EC4-AD78-864B4589B4C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "..\Models\Models.csproj", "{794855A4-0D45-4EC4-AD78-864B4589B4C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "..\DAL\DAL.csproj", "{8A229827-2570-49FE-9A79-88663743421C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "..\DAL\DAL.csproj", "{8A229827-2570-49FE-9A79-88663743421C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "..\Services\Services.csproj", "{914AA096-EFAF-4853-BA31-B44C27B54EE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "..\Services\Services.csproj", "{914AA096-EFAF-4853-BA31-B44C27B54EE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IServices", "..\IServices\IServices.csproj", "{82F322A9-A207-4000-90B7-56C0DF8467CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IServices", "..\IServices\IServices.csproj", "{82F322A9-A207-4000-90B7-56C0DF8467CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "..\Utils\Utils.csproj", "{15BBBB31-2BF8-4E9A-81B1-5602EED27055}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{82F322A9-A207-4000-90B7-56C0DF8467CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82F322A9-A207-4000-90B7-56C0DF8467CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82F322A9-A207-4000-90B7-56C0DF8467CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15BBBB31-2BF8-4E9A-81B1-5602EED27055}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15BBBB31-2BF8-4E9A-81B1-5602EED27055}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15BBBB31-2BF8-4E9A-81B1-5602EED27055}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15BBBB31-2BF8-4E9A-81B1-5602EED27055}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
